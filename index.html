@@ -1,0 +1,178 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Issuance Integration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        #bookIssuanceSection {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        table th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        #toggleBookIssuanceBtn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #toggleBookIssuanceBtn:hover {
+            background-color: #45a049;
+        }
+
+        #saveBookRecordsBtn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #saveBookRecordsBtn:hover {
+            background-color: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button id="toggleBookIssuanceBtn">Show/Hide Book Issuance</button>
+
+        <div id="bookIssuanceSection">
+            <h2>Book Issuance Records</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Name</th>
+                        <th>MTP SST</th>
+                        <th>MORAN SST</th>
+                        <th>H.BIRD P/A</th>
+                        <th>MORAN P/A</th>
+                        <th>SPOTLIGHT PE</th>
+                        <th>SPARK PE</th>
+                        <th>TOP SCHOLAR V/A</th>
+                        <th>SHARP AGRIC</th>
+                        <th>MTP AGRIC</th>
+                        <th>MENTOR CRE</th>
+                        <th>DISTINCTION CRE</th>
+                        <th>TOP SCHOLAR MATHS</th>
+                        <th>MASTER MATHS</th>
+                        <th>AKILI PEVU</th>
+                        <th>TOP SCHOLAR KISWA</th>
+                        <th>TOP SCHOLAR PRE-TECH</th>
+                        <th>TODAY PRETECH</th>
+                        <th>SPOTLIGHT SCIE</th>
+                        <th>ACTIVE SCIEN</th>
+                        <th>LONGHORN SCIENCE</th>
+                        <th>M.TECH SCIENCE</th>
+                        <th>MTP BUSINESS</th>
+                        <th>TODAY BUSINESS</th>
+                        <th>SKILLS ENGLISH</th>
+                        <th>SMART MIND ENG</th>
+                        <th>MTP HOMESCIENCE</th>
+                        <th>NEW PLANET H/SCIE</th>
+                    </tr>
+                </thead>
+                <tbody id="bookIssuanceBody"></tbody>
+            </table>
+            <button id="saveBookRecordsBtn">Save Book Records</button>
+        </div>
+    </div>
+
+    <script>
+        // Toggle book issuance section visibility
+        function toggleBookIssuanceSection() {
+            const section = document.getElementById('bookIssuanceSection');
+            section.style.display = section.style.display === 'none' || section.style.display === '' ? 'block' : 'none';
+        }
+
+        // Populate book issuance table
+        function populateBookIssuanceTable() {
+            const learners = [
+                { id: "1", name: "John Karanja" },
+                { id: "2", name: "Joseph Kamau" },
+                { id: "3", name: "George Njunge" },
+                // Add more learners as needed
+            ];
+
+            const tbody = document.getElementById('bookIssuanceBody');
+            tbody.innerHTML = '';
+
+            learners.forEach((learner, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${learner.name}</td>
+                    ${Array(27).fill('<td contenteditable="true">Issued</td>').join('')}
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Save book records
+        function saveBookRecords() {
+            const rows = document.querySelectorAll('#bookIssuanceBody tr');
+            const records = [];
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const learnerRecord = {
+                    name: cells[1].textContent,
+                    books: Array.from(cells).slice(2).map(cell => cell.textContent.trim())
+                };
+                records.push(learnerRecord);
+            });
+
+            // Use your existing Firebase save function
+            saveToFirebase(records); // Ensure saveToFirebase is implemented in your Firebase setup
+            Swal.fire('Success!', 'Book records have been saved!', 'success');
+        }
+
+        // Event listeners
+        document.getElementById('toggleBookIssuanceBtn').addEventListener('click', toggleBookIssuanceSection);
+        document.getElementById('saveBookRecordsBtn').addEventListener('click', saveBookRecords);
+
+        // Populate table on page load
+        document.addEventListener('DOMContentLoaded', populateBookIssuanceTable);
+    </script>
+</body>
+</html>
