@@ -1696,51 +1696,68 @@ button[onclick^="show"] {
             measurementId: "G-MHKTNPG712"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        const learnersRef = ref(database, "learners");
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+const learnersRef = ref(database, "learners");
 
-        document.getElementById('registerButton').addEventListener('click', () => {
-            const name = document.getElementById('name').value.trim();
-            const gender = document.getElementById('gender').value;
-            const grade = document.getElementById('grade').value;
-            const age = document.getElementById('age').value;
-            const parentName = document.getElementById('parentName').value.trim();
-            const parentPhone = document.getElementById('parentPhone').value.trim();
-            const birthCert = document.getElementById('birthCert').value.trim();
-            const admissionNo = document.getElementById('admissionNo').value.trim();
-            const photo = document.getElementById('photo').files[0];
+document.getElementById('registerButton').addEventListener('click', () => {
+    const name = document.getElementById('name').value.trim();
+    const gender = document.getElementById('gender').value;
+    const grade = document.getElementById('grade').value;
+    const age = document.getElementById('age').value;
+    const parentName = document.getElementById('parentName').value.trim();
+    const parentPhone = document.getElementById('parentPhone').value.trim();
+    const birthCert = document.getElementById('birthCert').value.trim();
+    const admissionNo = document.getElementById('admissionNo').value.trim();
+    const photo = document.getElementById('photo').files[0];
 
-       if (!name || !gender || !grade || !age || !parentName || !parentPhone || !birthCert || !admissionNo || !photo) {
-    showToast("All fields are required.", "error");
-    return;
-}
+    if (!name || !gender || !grade) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Missing Required Fields',
+            text: 'Please fill in Name, Gender, and Grade before submitting.',
+            confirmButtonColor: '#d33'
+        });
+        return;
+    }
 
+    const learnerData = {
+        name,
+        gender,
+        grade,
+        ...(age && { age }),
+        ...(parentName && { parentName }),
+        ...(parentPhone && { parentPhone }),
+        ...(birthCert && { birthCert }),
+        ...(admissionNo && { admissionNo }),
+        ...(photo && { photo: URL.createObjectURL(photo) }),
+    };
 
-       const newLearnerRef = push(learnersRef);
-set(newLearnerRef, {
-    name,
-    gender,
-    grade,
-    age,
-    parentName,
-    parentPhone,
-    birthCert,
-    admissionNo,
-    photo: URL.createObjectURL(photo)
-}).then(() => {
-    showToast("Learner added successfully!", "success");
-    document.getElementById('learnerForm').reset();
-}).catch(err => {
-    console.error("Error adding learner: ", err);
-    showToast("Failed to add learner. Please try again.", "error");
+    const newLearnerRef = push(learnersRef);
+    set(newLearnerRef, learnerData)
+        .then(() => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Learner registered successfully.',
+                confirmButtonColor: '#28a745'
+            });
+            document.getElementById('learnerForm').reset();
+        })
+        .catch(err => {
+            console.error("Error adding learner: ", err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Registration Failed',
+                text: 'There was an issue saving learner data. Please try again.',
+                confirmButtonColor: '#d33'
+            });
+        });
 });
 
-        });
 
-        const tableBody = document.getElementById('learnersList');
-        const filterGrade = document.getElementById('filterGrade');
-        const printButton = document.getElementById('printButton');
+const tableBody = document.getElementById('learnersList');
+const filterGradeSelect = document.getElementById('filterGrade'); // Reference to the dropdown
 
 onValue(learnersRef, (snapshot) => {
     tableBody.innerHTML = "";
@@ -1757,83 +1774,111 @@ onValue(learnersRef, (snapshot) => {
         newRow.setAttribute('data-grade', data.grade);
         newRow.innerHTML = `
             <td>${index++}</td>
-            <td><img src="${data.photo}" alt="Photo"></td>
-            <td contenteditable="true" class="editable">${data.name}</td>
-            <td contenteditable="true" class="editable">${data.gender}</td>
-            <td contenteditable="true" class="editable">${data.grade}</td>
-            <td contenteditable="true" class="editable">${data.age}</td>
-            <td contenteditable="true" class="editable">${data.parentName}</td>
-            <td contenteditable="true" class="editable">${data.parentPhone}</td>
-            <td contenteditable="true" class="editable">${data.birthCert}</td>
-            <td contenteditable="true" class="editable">${data.admissionNo}</td>
-   <td>
-  <button class="edit-photo-btn" data-key="${learnerKey}">
-    <i class="fas fa-camera"></i> Edit Photo
-  </button>
-</td>
-
-<td>
-  <button class="delete-btn" data-key="${learnerKey}">
-    <i class="fas fa-trash-alt"></i> Delete
-  </button>
-</td>
-
+            <td><img src="${data.photo || 'default.png'}" alt="Photo"></td>
+            <td contenteditable="true" class="editable">${data.name || ''}</td>
+            <td contenteditable="true" class="editable">${data.gender || ''}</td>
+            <td contenteditable="true" class="editable">${data.grade || ''}</td>
+            <td contenteditable="true" class="editable">${data.age || ''}</td>
+            <td contenteditable="true" class="editable">${data.parentName || ''}</td>
+            <td contenteditable="true" class="editable">${data.parentPhone || ''}</td>
+            <td contenteditable="true" class="editable">${data.birthCert || ''}</td>
+            <td contenteditable="true" class="editable">${data.admissionNo || ''}</td>
+            <td>
+                <button class="edit-photo-btn" data-key="${learnerKey}">
+                    <i class="fas fa-camera"></i> Edit Photo
+                </button>
+            </td>
+            <td>
+                <button class="delete-btn" data-key="${learnerKey}">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
+            </td>
         `;
 
         tableBody.appendChild(newRow);
 
- // Add event listener for changes in editable cells
-newRow.querySelectorAll('.editable').forEach(cell => {
-    cell.addEventListener('blur', (e) => {
-        // Update the learner in Firebase with the new value
-        const updatedLearner = {
-            name: newRow.cells[2].textContent.trim(),
-            gender: newRow.cells[3].textContent.trim(),
-            grade: newRow.cells[4].textContent.trim(),
-            age: newRow.cells[5].textContent.trim(),
-            parentName: newRow.cells[6].textContent.trim(),
-            parentPhone: newRow.cells[7].textContent.trim(),
-            birthCert: newRow.cells[8].textContent.trim(),
-            admissionNo: newRow.cells[9].textContent.trim(),
-            photo: data.photo, // Ensure the photo is retained
-        };
+        // 🔄 Handle inline cell editing
+        newRow.querySelectorAll('.editable').forEach(cell => {
+            cell.addEventListener('blur', () => {
+                const fieldIndex = cell.cellIndex;
+                const fieldNames = ['name', 'gender', 'grade', 'age', 'parentName', 'parentPhone', 'birthCert', 'admissionNo'];
+                const fieldName = fieldNames[fieldIndex - 2];
+                const value = cell.textContent.trim();
 
-        set(ref(database, `learners/${learnerKey}`), updatedLearner)
-            .then(() => {
-                showToast("Learner updated successfully!", "success");
-            })
-            .catch(err => {
-                console.error("Error updating learner: ", err);
-                showToast("Failed to update learner. Please try again.", "error");
+                if (!fieldName || value === '') {
+                    showToast("Field cannot be empty.", "error");
+                    return;
+                }
+
+                const updatedLearner = {
+                    ...data,
+                    [fieldName]: value
+                };
+
+                set(ref(database, `learners/${learnerKey}`), updatedLearner)
+                    .then(() => showToast(`${fieldName} updated successfully!`, "success"))
+                    .catch(err => {
+                        console.error("Error updating learner:", err);
+                        showToast("Failed to update learner. Please try again.", "error");
+                    });
             });
+        });
+
+        // ❌ SweetAlert2 delete confirmation
+        newRow.querySelector('.delete-btn').addEventListener('click', (e) => {
+            const learnerKey = e.currentTarget.getAttribute('data-key');
+
+            Swal.fire({
+                title: 'Confirm Deletion',
+                text: 'Are you sure you want to permanently delete this learner?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    remove(ref(database, `learners/${learnerKey}`))
+                        .then(() => {
+                            Swal.fire('Deleted!', 'Learner has been deleted.', 'success');
+                        })
+                        .catch(err => {
+                            console.error("Error deleting learner:", err);
+                            Swal.fire('Error', 'Failed to delete learner.', 'error');
+                        });
+                }
+            });
+        });
     });
-});
 
+    // ✅ Populate the filterGrade dropdown
+    if (filterGradeSelect) {
+        filterGradeSelect.innerHTML = `<option value="">Filter by Grade</option>`;
+        grades.forEach(grade => {
+            const option = document.createElement('option');
+            option.value = grade;
+            option.textContent = grade;
+            filterGradeSelect.appendChild(option);
+        });
+    }
+});
+// Filter learners table by name or admission number
+  document.getElementById("searchInput").addEventListener("input", function () {
+    const query = this.value.toLowerCase();
+    const rows = document.querySelectorAll("#learnersList tr");
+
+    rows.forEach(row => {
+      const name = row.cells[2].textContent.toLowerCase();
+      const admissionNo = row.cells[9].textContent.toLowerCase();
+
+      if (name.includes(query) || admissionNo.includes(query)) {
+        row.style.display = "";
+      } else {
+        row.style.display = "none";
+      }
     });
-
-   // Clear existing options except the first placeholder
-filterGrade.innerHTML = `<option value="">Filter by Grade</option>`;
-
-// Populate dropdown with unique grades from the database
-grades.forEach(grade => {
-    const option = document.createElement('option');
-    option.value = grade;
-    option.textContent = grade;
-    filterGrade.appendChild(option);
-});
-
-document.querySelectorAll('.delete-btn').forEach(button => {
-button.addEventListener('click', () => {
-const key = button.getAttribute('data-key');
-if (confirm("Are you sure you want to delete this learner?")) {
-remove(ref(database, `learners/${key}`))
- .then(() => showToast("Learner deleted successfully!", "success"))
-       
-.catch(err => console.error("Error deleting learner: ", err));
-}
-});
-});
-});
+  });
 
 printButton.addEventListener('click', () => {
     const schoolName = "Your School Name";
@@ -1929,6 +1974,7 @@ function printRegisteredLearners(schoolName, year, term, learners) {
     printWindow.document.close();
     printWindow.print();
 }
+
 document.addEventListener('DOMContentLoaded', () => {
     // Get modal and close button
     const modal = document.getElementById('learnerModal');
@@ -2009,22 +2055,18 @@ onValue(learnersRef, (snapshot) => {
 });
 
 // Update learners dropdown based on selected grade
-document.getElementById("gradeSelect").addEventListener("change", (event) => {
-    const selectedGrade = event.target.value;
-    const learnerSelect = document.getElementById("learnerSelect");
-    learnerSelect.innerHTML = `<option value="">Select Learner</option>`;
+document.getElementById('filterGrade').addEventListener('change', () => {
+  const selectedGrade = document.getElementById('filterGrade').value;
+  const allRows = document.querySelectorAll('#learnersList tr');
 
-    onValue(learnersRef, (snapshot) => {
-        snapshot.forEach(childSnapshot => {
-            const learner = childSnapshot.val();
-            if (learner.grade === selectedGrade) {
-                const option = document.createElement("option");
-                option.value = childSnapshot.key;
-                option.textContent = `${learner.name} (${learner.admissionNo})`;
-                learnerSelect.appendChild(option);
-            }
-        });
-    });
+  allRows.forEach(row => {
+    const rowGrade = row.getAttribute('data-grade');
+    if (selectedGrade === "" || rowGrade === selectedGrade) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  });
 });
 
   // Attach event listeners
@@ -2073,13 +2115,23 @@ document.getElementById("gradeSelect").addEventListener("change", (event) => {
 document.getElementById("saveMarksButton").addEventListener("click", () => {
   const learnerKey = document.getElementById("learnerSelect").value;
   if (!learnerKey) {
-    showToast("Please select a learner.", "error");
+    Swal.fire({
+      icon: 'error',
+      title: 'Missing Learner',
+      text: 'Please select a learner before saving marks.',
+      confirmButtonColor: '#d33'
+    });
     return;
   }
 
   const examPeriod = document.getElementById("examPeriod").value;
   if (!examPeriod) {
-    showToast("Please select the exam period.", "error");
+    Swal.fire({
+      icon: 'error',
+      title: 'Missing Exam Period',
+      text: 'Please select the exam period before saving marks.',
+      confirmButtonColor: '#d33'
+    });
     return;
   }
 
@@ -2108,16 +2160,25 @@ document.getElementById("saveMarksButton").addEventListener("click", () => {
   // Save marks to database
   set(ref(database, `learners/${learnerKey}/marks/${examPeriod}`), marksData)
     .then(() => {
-      showToast(`Marks recorded successfully for ${examPeriod}!`, "success");
+      Swal.fire({
+        icon: 'success',
+        title: 'Marks Saved',
+        text: `Marks recorded successfully for ${examPeriod}!`,
+        confirmButtonColor: '#28a745'
+      });
       document.getElementById("marksForm").reset();
       filterLearnersWithMarks(); // Refresh learner list immediately after saving
     })
     .catch(err => {
       console.error("Error saving marks: ", err);
-      showToast("Failed to record marks. Please try again.", "error");
+      Swal.fire({
+        icon: 'error',
+        title: 'Save Failed',
+        text: 'Failed to record marks. Please try again.',
+        confirmButtonColor: '#d33'
+      });
     });
 });
-
 
 function filterLearnersWithMarks() {
   const gradeSelect = document.getElementById("gradeSelect");
@@ -3184,23 +3245,14 @@ function generateGenderPerformance(selectedGrade, selectedExamPeriod) {
     }
 }
 
+
 document.getElementById("generateAssessmentReportsBtn").addEventListener("click", function () {
     const grade = document.getElementById("reportGradeSelect").value;
-    const examPeriod = document.getElementById("reportExamPeriodSelect").value;
 
-    // Handle missing selections
+    // Handle missing grade selection
     if (!grade || grade === "Select Grade") {
         createCustomAlert(
             "Oops! You forgot to select a grade. Please choose a grade from the dropdown before generating the assessment reports.",
-            "#f8d7da",
-            "#721c24"
-        );
-        return;
-    }
-
-    if (!examPeriod || examPeriod === "-- Select Exam Period --") {
-        createCustomAlert(
-            "Oops! You forgot to select an exam period. Please choose one before generating the assessment reports.",
             "#f8d7da",
             "#721c24"
         );
@@ -3225,21 +3277,10 @@ document.getElementById("generateAssessmentReportsBtn").addEventListener("click"
         return;
     }
 
-    // Add the exam period to termDetails
-    const termDetails = {
-        year,
-        term,
-        closingDate,
-        openingDate,
-        classTeacherSignature,
-        principalSignature,
-        examPeriod // Optional if needed inside the report
-    };
-
-    // Call updated report generator (grade & exam period read directly inside the function)
-    generateLearnerAssessmentReports(termDetails);
+    // Pass term details and selected grade to the report generator
+    const termDetails = { year, term, closingDate, openingDate, classTeacherSignature, principalSignature };
+    generateLearnerAssessmentReports(termDetails, grade); // Pass grade for filtered reports
 });
-
 
 /**
  * Creates a custom alert.
@@ -3292,7 +3333,6 @@ function createCustomAlert(message, bgColor, textColor) {
     document.body.appendChild(customAlert);
 }
 
-
 function generateLearnerAssessmentReports(termDetails) {
     const { year, term, closingDate, openingDate, classTeacherSignature, principalSignature } = termDetails;
 
@@ -3306,7 +3346,6 @@ function generateLearnerAssessmentReports(termDetails) {
     const date = new Date().toLocaleDateString("en-GB");
 
     const gradeFilter = document.getElementById("reportGradeSelect").value;
-    const examPeriodFilter = document.getElementById("reportExamPeriodSelect").value;
 
     rows.forEach(row => {
         const cells = row.querySelectorAll("td");
@@ -3314,12 +3353,9 @@ function generateLearnerAssessmentReports(termDetails) {
 
         const learnerName = cells[1].textContent.trim();
         const grade = cells[2].textContent.trim();
-        
-        // ✅ Try to read exam period from a data attribute first, fallback to cell 22
-        const rowExamPeriod = row.getAttribute("data-exam-period") || cells[22]?.textContent.trim();
 
-        // ✅ Filter by selected grade and exam period
-        if (grade !== gradeFilter || rowExamPeriod !== examPeriodFilter) return;
+        // ? Filter by selected grade
+        if (grade !== gradeFilter) return;
 
         const totalMarks = cells[21].textContent.trim();
         const performance = getPerformanceLevel(totalMarks);
@@ -3368,7 +3404,6 @@ function generateLearnerAssessmentReports(termDetails) {
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div style="flex: 1;">
                     <p><strong>GRADE:</strong> ${grade} &emsp; <strong>TERM:</strong> ${term} &emsp; <strong>YEAR:</strong> ${year}</p>
-                    <p><strong>EXAM PERIOD:</strong> ${rowExamPeriod}</p>
                     <p><strong>Learner's Name:</strong> ${learnerName}</p>
                 </div>
                 <div>
@@ -3421,9 +3456,9 @@ function generateLearnerAssessmentReports(termDetails) {
         container.appendChild(report);
     });
 
-    // ✅ Print button with updated label
+    // Add Print Button
     const printButton = document.createElement("button");
-    printButton.textContent = `Print Reports for ${gradeFilter} - ${examPeriodFilter}`;
+    printButton.textContent = `Print Reports for ${selectedGrade || "All Grades"}`;
     printButton.style.marginTop = "20px";
     printButton.style.padding = "10px 20px";
     printButton.style.background = "#007BFF";
@@ -3439,13 +3474,12 @@ function generateLearnerAssessmentReports(termDetails) {
         document.body.innerHTML = printContent;
         window.print();
         document.body.innerHTML = originalContent;
-        location.reload(); // Reset after printing
+        location.reload(); // Reload to reset the page
     });
 
     container.appendChild(printButton);
     container.scrollIntoView({ behavior: "smooth" });
 }
-
 
 
 const subjectList = [
@@ -5318,25 +5352,29 @@ function generateSubjectRankingPerLearner(selectedGrade, selectedPeriod) {
     });
 }
 
-// Function to filter learners table by selected grade
-function filterLearnersByGrade() {
-  const selectedGrade = document.getElementById("filterGrade").value.toLowerCase();
-  const rows = document.querySelectorAll("#learnersList tr");
+ function enableEnterAsTab(containerSelector) {
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
 
-  rows.forEach(row => {
-    const gradeCell = row.cells[4].textContent.toLowerCase();
-    if (selectedGrade === "" || gradeCell === selectedGrade) {
-      row.style.display = "";
-    } else {
-      row.style.display = "none";
-    }
-  });
-}
+    container.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault(); // Prevent Enter from triggering default behavior
 
-// Attach event listener to grade filter dropdown
-document.getElementById("filterGrade").addEventListener("change", filterLearnersByGrade);
+        const focusable = Array.from(container.querySelectorAll('input, select, button, [tabindex]'))
+          .filter(el => !el.disabled && el.tabIndex >= 0 && el.offsetParent !== null);
 
+        const index = focusable.indexOf(document.activeElement);
+        if (index > -1 && index < focusable.length - 1) {
+          focusable[index + 1].focus();
+        }
+      }
+    });
+  }
 
+  // Enable Enter-as-Tab behavior in these sections
+  enableEnterAsTab('#learnerForm');      // Registration form
+  enableEnterAsTab('#marksForm');        // Marks form
+  enableEnterAsTab('#learnersList');     // Registered Learners table rows
 
 
 
