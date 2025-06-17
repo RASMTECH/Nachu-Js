@@ -494,6 +494,32 @@ button[onclick^="show"] {
 .toast.info {
   background-color: #2196F3;
 }
+#marksInputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* two equal columns */
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+@media (max-width: 600px) {
+  #marksInputs {
+    grid-template-columns: 1fr;
+  }
+}
 
     </style>
 </head>
@@ -998,17 +1024,18 @@ button[onclick^="show"] {
       </select>
     </div>
 
-    <div id="marksInputs">
-      <div class="form-group"><label>Eng</label><input type="number" id="eng" required></div>
-      <div class="form-group"><label>Math</label><input type="number" id="math" required></div>
-      <div class="form-group"><label>Pre-Tech</label><input type="number" id="preTech" required></div>
-      <div class="form-group"><label>Kiswahili</label><input type="number" id="kiswahili" required></div>
-      <div class="form-group"><label>Science</label><input type="number" id="science" required></div>
-      <div class="form-group"><label>Social</label><input type="number" id="social" required></div>
-      <div class="form-group"><label>Agriculture</label><input type="number" id="agriculture" required></div>
-      <div class="form-group"><label>CRE</label><input type="number" id="cre" required></div>
-      <div class="form-group"><label>Creative Art</label><input type="number" id="creativeArt" required></div>
-    </div>
+  <div id="marksInputs">
+  <div class="form-group"><label>Eng</label><input type="number" id="eng" required></div>
+  <div class="form-group"><label>Math</label><input type="number" id="math" required></div>
+  <div class="form-group"><label>Pre-Tech</label><input type="number" id="preTech" required></div>
+  <div class="form-group"><label>Kiswahili</label><input type="number" id="kiswahili" required></div>
+  <div class="form-group"><label>Science</label><input type="number" id="science" required></div>
+  <div class="form-group"><label>Social</label><input type="number" id="social" required></div>
+  <div class="form-group"><label>Agriculture</label><input type="number" id="agriculture" required></div>
+  <div class="form-group"><label>CRE</label><input type="number" id="cre" required></div>
+  <div class="form-group"><label>Creative Art</label><input type="number" id="creativeArt" required></div>
+</div>
+
 
     <div class="form-group">
       <button type="button" id="saveMarksButton">
@@ -1305,7 +1332,7 @@ button[onclick^="show"] {
     font-size: 16px;
   ">
     <i class="fas fa-bullhorn" style="color: #000; font-size: 24px; margin-right: 10px;"></i>
-    <strong>RASM Reminder:</strong>&nbsp;Please select a grade or subject before generating any report.
+    <strong>RASM Reminder:</strong>&nbsp;Please select  grade,exam period and subject before generating any report ,Thankyou.
   </div>
 <!-- Grade Selection -->
 <div style="margin-bottom: 16px;">
@@ -2240,13 +2267,22 @@ filterLearnersWithMarks();
 const marksTableBody = document.getElementById("marksList");
 const filterMarksGrade = document.getElementById("filterMarksGrade");
 const marksExamPeriodSelect = document.getElementById("marksExamPeriodSelect");
-
 function loadMarksFromFirebase() {
   const examPeriod = marksExamPeriodSelect.value;
   if (!examPeriod) {
-    alert("Please select an exam period to load marks.");
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'warning',
+      title: 'Please select an exam period to load marks.',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true
+    });
     return;
   }
+
+
 
   onValue(learnersRef, (snapshot) => {
     marksTableBody.innerHTML = "";
@@ -2432,25 +2468,72 @@ document.addEventListener("click", function (e) {
       return;
     }
 
-    if (confirm("Are you sure you want to delete this learner's marks for this exam?")) {
-      const learnerMarksRef = ref(database, `learners/${learnerKey}/marks/${examPeriod}`);
+    // SweetAlert2 confirmation dialog
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You want to delete this learner's marks for this exam?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const learnerMarksRef = ref(database, `learners/${learnerKey}/marks/${examPeriod}`);
 
-      set(learnerMarksRef, null)
-        .then(() => {
-          alert("Marks deleted successfully!");
-          loadMarksFromFirebase();  // Refresh table
-        })
-        .catch(err => {
-          console.error("Error deleting marks: ", err);
-        });
-    }
+        set(learnerMarksRef, null)
+          .then(() => {
+            // Success toast
+            Swal.fire({
+              toast: true,
+              position: 'top-end',
+              icon: 'success',
+              title: "Marks deleted successfully!",
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true
+            });
+            loadMarksFromFirebase();  // Refresh table
+          })
+          .catch(err => {
+            console.error("Error deleting marks: ", err);
+            // Error toast
+            Swal.fire({
+              toast: true,
+              position: 'top-end',
+              icon: 'error',
+              title: "Failed to delete marks.",
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true
+            });
+          });
+      }
+    });
   }
 });
+
+// Subject Champions button event — optionally toast if no selection
 document.getElementById("subjectChampionsBtn").addEventListener("click", () => {
-    const grade = document.getElementById("reportGradeSelect").value;
-    const examPeriod = document.getElementById("reportExamPeriodSelect").value;
-    generateSubjectChampionsReport(grade, examPeriod);
+  const grade = document.getElementById("reportGradeSelect").value;
+  const examPeriod = document.getElementById("reportExamPeriodSelect").value;
+
+  if (!grade || !examPeriod) {
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'warning',
+      title: 'Please select both grade and exam period first.',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true
+    });
+    return;
+  }
+
+  generateSubjectChampionsReport(grade, examPeriod);
 });
+
 
 
 document.getElementById("subjectPerformanceBtn").addEventListener("click", () => {
@@ -3644,22 +3727,39 @@ document.getElementById("combineMarksByGradeBtn").addEventListener("click", () =
 });
 
 document.getElementById("confirmGradeBtn").addEventListener("click", () => {
-    const selectedGrade = document.getElementById("gradeInput").value.trim();
-    const examPeriod = document.getElementById("reportExamPeriodSelect").value;
+  const selectedGrade = document.getElementById("gradeInput").value.trim();
+  const examPeriod = document.getElementById("reportExamPeriodSelect").value;
 
-    if (!selectedGrade) {
-        alert("Please enter a valid grade.");
-        return;
-    }
+  if (!selectedGrade) {
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'warning',
+      title: 'Please enter a valid grade.',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true
+    });
+    return;
+  }
 
-    if (!examPeriod || examPeriod === "Select Exam Period") {
-        alert("Please select a valid exam period.");
-        return;
-    }
+  if (!examPeriod || examPeriod === "Select Exam Period") {
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'warning',
+      title: 'Please select a valid exam period.',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true
+    });
+    return;
+  }
 
-    document.getElementById("customPrompt").style.display = "none";
-    combineMarksByGradeWithDetails(selectedGrade, examPeriod); // ✅ pass both
+  document.getElementById("customPrompt").style.display = "none";
+  combineMarksByGradeWithDetails(selectedGrade, examPeriod);
 });
+
 
 document.getElementById("cancelGradeBtn").addEventListener("click", () => {
     document.getElementById("customPrompt").style.display = "none";
@@ -3731,11 +3831,19 @@ function combineMarksByGradeWithDetails(mainGrade, selectedPeriod) {
             learnerCount++;
         }
     });
+if (learnersData.length === 0) {
+  Swal.fire({
+    toast: true,
+    position: 'top-end',
+    icon: 'info',
+    title: `No data found for grade ${mainGrade} and period ${selectedPeriod}.`,
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true
+  });
+  return;
+}
 
-    if (learnersData.length === 0) {
-        alert(`No data found for grade ${mainGrade} and period ${selectedPeriod}.`);
-        return;
-    }
 
     const year = new Date().getFullYear();
     const avg = val => (learnerCount ? (val / learnerCount).toFixed(2) : "0.00");
@@ -4070,15 +4178,23 @@ window.printClassList = function() {
     printWindow.document.close();
     printWindow.print();
 };
-
 // Button click event listener
 document.getElementById("generateClassListBtn").addEventListener("click", () => {
-    const selectedGrade = document.getElementById("classListGradeSelect").value;
-    if (!selectedGrade) {
-        alert("Please select a grade.");
-        return;
-    }
-    generateClassList(selectedGrade);
+  const selectedGrade = document.getElementById("classListGradeSelect").value;
+  if (!selectedGrade) {
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'warning',
+      title: 'Please select a grade.',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true
+    });
+    return;
+  }
+
+  generateClassList(selectedGrade);
 });
 
 document.getElementById("generateParentsListBtn").addEventListener("click", () => {
@@ -4167,21 +4283,38 @@ document.getElementById("generateParentsListBtn").addEventListener("click", () =
 });
 
 document.getElementById("groupByPathwaysBtn").addEventListener("click", () => {
-    const grade = document.getElementById("reportGradeSelect").value;
-    const examPeriod = document.getElementById("reportExamPeriodSelect").value;
+  const grade = document.getElementById("reportGradeSelect").value;
+  const examPeriod = document.getElementById("reportExamPeriodSelect").value;
 
-    if (!grade || grade === "Select Grade") {
-        alert("Please select a grade.");
-        return;
-    }
+  if (!grade || grade === "Select Grade") {
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'warning',
+      title: 'Please select a grade.',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true
+    });
+    return;
+  }
 
-    if (!examPeriod || examPeriod === "Select Exam Period") {
-        alert("Please select an exam period.");
-        return;
-    }
+  if (!examPeriod || examPeriod === "Select Exam Period") {
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'warning',
+      title: 'Please select an exam period.',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true
+    });
+    return;
+  }
 
-    generatePathwayGrouping(grade, examPeriod);
+  generatePathwayGrouping(grade, examPeriod);
 });
+
 
 function generatePathwayGrouping(selectedGrade, selectedExamPeriod) {
     const pathways = {
@@ -5234,18 +5367,26 @@ function showToast(message, type = 'info') {
   }, 3000);
 }
 
-
 document.getElementById("subjectRankingReportBtn").addEventListener("click", () => {
-    const grade = document.getElementById("reportGradeSelect").value;
-    const examPeriod = document.getElementById("reportExamPeriodSelect").value;
+  const grade = document.getElementById("reportGradeSelect").value;
+  const examPeriod = document.getElementById("reportExamPeriodSelect").value;
 
-    if (!grade || !examPeriod) {
-        alert("Please select both grade and exam period.");
-        return;
-    }
+  if (!grade || !examPeriod) {
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'warning',
+      title: 'Please select both grade and exam period.',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true
+    });
+    return;
+  }
 
-    generateSubjectRankingPerLearner(grade, examPeriod);
+  generateSubjectRankingPerLearner(grade, examPeriod);
 });
+
 
 
 function generateSubjectRankingPerLearner(selectedGrade, selectedPeriod) {
