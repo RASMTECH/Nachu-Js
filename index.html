@@ -521,6 +521,17 @@ button[onclick^="show"] {
   }
 }
 
+@keyframes blink {
+  0%   { opacity: 1; }
+  50%  { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.blinking {
+  animation: blink 1s infinite;
+}
+
+
     </style>
 </head>
 <body>
@@ -615,7 +626,20 @@ button[onclick^="show"] {
     </button>
   </div>
 </div>
-
+<div 
+  id="announcement" 
+  style="
+    margin: 10px 0; 
+    padding: 10px 15px; 
+    background-color: #fff3cd; 
+    border: 1px solid #ffeeba; 
+    color: #856404; 
+    border-radius: 4px;
+    font-size: 0.95rem;
+  "
+>
+  📢 <strong>Note:</strong> All new learners must be registered before entering marks.
+</div>
 <!-- Exam & Marks Controls Master Toggle -->
 <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 20px;">
   <button 
@@ -685,7 +709,38 @@ button[onclick^="show"] {
 
   </div>
 </div>
+<div 
+  id="onlineSafetyNote" 
+  style="
+    position: relative;
+    margin: 15px 0; 
+    padding: 14px 20px; 
+    background-color: #e0f7fa; 
+    border-left: 5px solid #00796b; 
+    color: #004d40; 
+    border-radius: 5px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  "
+>
+  🔒 <strong>Online Safety Tip:</strong> Always protect your personal information and avoid sharing passwords or sensitive data on public networks.<br><br>
+  🌸 <em>RASM Wishes you a productive and wonderful day ahead!</em>
 
+  <span 
+    onclick="this.parentElement.style.display='none';" 
+    style="
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      cursor: pointer;
+      color: #004d40;
+      font-weight: bold;
+    "
+  >&times;</span>
+</div>
+
+
+</div>
 <!-- Wrapped form, hidden by default -->
 <div id="registrationContainer" style="display: none; margin-top: 20px; max-width: 450px; margin: auto; background-color: #8BC34A; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
   <h2 style="color: white; background-color: gold; padding: 10px 12px; border-radius: 4px; text-align: center;">
@@ -1278,7 +1333,35 @@ button[onclick^="show"] {
  <button id="printFilteredMarksBtn" class="print-button" style="display: block; width: 180px;">
     <i class="fas fa-print"></i> Print Merit List
   </button>
-<button id="saveEditedMarksBtn" style="margin-top: 10px; display: none;">💾 Save Changes</button>
+<div 
+  id="thankYouNote" 
+  style="
+    position: relative;
+    margin: 15px 0; 
+    padding: 14px 20px; 
+    background-color: #fdecea; 
+    border-left: 5px solid #d32f2f; 
+    color: #b71c1c; 
+    border-radius: 5px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  "
+>
+  🙏 <strong>Thank you for using our system!</strong> We truly appreciate your trust and support.<br><br>
+  🌸 <em>Have a great day and see you next time!</em>
+
+  <span 
+    onclick="this.parentElement.style.display='none';" 
+    style="
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      cursor: pointer;
+      color: #b71c1c;
+      font-weight: bold;
+    "
+  >&times;</span>
+</div>
 
     </div>
 
