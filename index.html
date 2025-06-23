@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1276,8 +1276,9 @@ button[onclick^="show"] {
     <div class="form-group">
       <label>&nbsp;</label> <!-- Empty label for alignment -->
  <button id="printFilteredMarksBtn" class="print-button" style="display: block; width: 180px;">
-    <i class="fas fa-print"></i> Print Filtered Marks
+    <i class="fas fa-print"></i> Print Merit List
   </button>
+<button id="saveEditedMarksBtn" style="margin-top: 10px; display: none;">💾 Save Changes</button>
 
     </div>
 
@@ -1298,7 +1299,7 @@ button[onclick^="show"] {
         <th>Scie</th><th>Lev</th>
         <th>Sst</th><th>Lev</th>
         <th>Agric</th><th>Lev</th>
-        <th>CRE</th><th>Lev</th>
+        <th>Cre</th><th>Lev</th>
         <th>C/A</th><th>Lev</th>
         <th>Total Marks</th>
         <th>Action</th>
@@ -2263,18 +2264,19 @@ document.getElementById("gradeSelect").addEventListener("change", filterLearners
 
 // Populate the initial dropdown
 filterLearnersWithMarks();
-
 const marksTableBody = document.getElementById("marksList");
 const filterMarksGrade = document.getElementById("filterMarksGrade");
 const marksExamPeriodSelect = document.getElementById("marksExamPeriodSelect");
 function loadMarksFromFirebase() {
   const examPeriod = marksExamPeriodSelect.value;
-  if (!examPeriod) {
+  const selectedGrade = filterMarksGrade.value;
+
+  if (!examPeriod || !selectedGrade) {
     Swal.fire({
       toast: true,
       position: 'top-end',
       icon: 'warning',
-      title: 'Please select an exam period to load marks.',
+      title: 'Please select both grade and exam period to load marks.',
       showConfirmButton: false,
       timer: 3000,
       timerProgressBar: true
@@ -2282,28 +2284,28 @@ function loadMarksFromFirebase() {
     return;
   }
 
-
-
   onValue(learnersRef, (snapshot) => {
     marksTableBody.innerHTML = "";
     const grades = new Set();
-    let index = 1;
 
     let sums = {
       eng: 0, math: 0, preTech: 0, kiswahili: 0,
-      science: 0, social: 0, agriculture: 0, cre: 0, creativeArt: 0, totalMarks: 0
+      science: 0, social: 0, agriculture: 0,
+      cre: 0, creativeArt: 0, totalMarks: 0
     };
 
-    let learnersWithMarks = 0;
+    const learnersArray = [];
 
     snapshot.forEach(childSnapshot => {
       const data = childSnapshot.val();
       const marksData = data.marks || {};
       const marks = marksData[examPeriod] || null;
 
-      if (marks) {
-        learnersWithMarks++;
+      if (data.grade) {
+        grades.add(data.grade);
+      }
 
+      if (marks && data.grade === selectedGrade) {
         const rowTotal =
           (parseFloat(marks.eng) || 0) +
           (parseFloat(marks.math) || 0) +
@@ -2315,49 +2317,87 @@ function loadMarksFromFirebase() {
           (parseFloat(marks.cre) || 0) +
           (parseFloat(marks.creativeArt) || 0);
 
-        sums.eng += (parseFloat(marks.eng) || 0);
-        sums.math += (parseFloat(marks.math) || 0);
-        sums.preTech += (parseFloat(marks.preTech) || 0);
-        sums.kiswahili += (parseFloat(marks.kiswahili) || 0);
-        sums.science += (parseFloat(marks.science) || 0);
-        sums.social += (parseFloat(marks.social) || 0);
-        sums.agriculture += (parseFloat(marks.agriculture) || 0);
-        sums.cre += (parseFloat(marks.cre) || 0);
-        sums.creativeArt += (parseFloat(marks.creativeArt) || 0);
-        sums.totalMarks += rowTotal;
-
-        grades.add(data.grade);
-
-        const row = document.createElement("tr");
-        row.setAttribute("data-grade", data.grade);
-       row.setAttribute("data-exam-period", examPeriod);
-        row.innerHTML = `
-          <td>${index++}</td>
-          <td>${data.name}</td>
-          <td>${data.grade}</td>
-          <td>${marks.eng || ''}</td><td>${marks.engLev || ''}</td>
-          <td>${marks.math || ''}</td><td>${marks.mathLev || ''}</td>
-          <td>${marks.preTech || ''}</td><td>${marks.preTechLev || ''}</td>
-          <td>${marks.kiswahili || ''}</td><td>${marks.kiswahiliLev || ''}</td>
-          <td>${marks.science || ''}</td><td>${marks.scienceLev || ''}</td>
-          <td>${marks.social || ''}</td><td>${marks.socialLev || ''}</td>
-          <td>${marks.agriculture || ''}</td><td>${marks.agricultureLev || ''}</td>
-          <td>${marks.cre || ''}</td><td>${marks.creLev || ''}</td>
-          <td>${marks.creativeArt || ''}</td><td>${marks.creativeArtLev || ''}</td>
-          <td><strong>${rowTotal}</strong></td>
-          <td><button class="deleteMarksBtn" data-key="${childSnapshot.key}" data-exam="${examPeriod}">Delete Marks</button></td>
-        `;
-        marksTableBody.appendChild(row);
+        learnersArray.push({
+          key: childSnapshot.key,
+          data,
+          marks,
+          rowTotal
+        });
       }
     });
 
+    learnersArray.sort((a, b) => b.rowTotal - a.rowTotal);
+
+    learnersArray.forEach((learner, index) => {
+      const { data, marks, rowTotal } = learner;
+
+      sums.eng += (parseFloat(marks.eng) || 0);
+      sums.math += (parseFloat(marks.math) || 0);
+      sums.preTech += (parseFloat(marks.preTech) || 0);
+      sums.kiswahili += (parseFloat(marks.kiswahili) || 0);
+      sums.science += (parseFloat(marks.science) || 0);
+      sums.social += (parseFloat(marks.social) || 0);
+      sums.agriculture += (parseFloat(marks.agriculture) || 0);
+      sums.cre += (parseFloat(marks.cre) || 0);
+      sums.creativeArt += (parseFloat(marks.creativeArt) || 0);
+      sums.totalMarks += rowTotal;
+
+      const row = document.createElement("tr");
+    row.setAttribute("data-grade", data.grade);
+row.setAttribute("data-exam-period", examPeriod);
+row.setAttribute("data-key", learner.key);
+
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${data.name}</td>
+        <td>${data.grade}</td>
+        <td data-editable="true">${marks.eng || ''}</td><td>${marks.engLev || ''}</td>
+        <td data-editable="true">${marks.math || ''}</td><td>${marks.mathLev || ''}</td>
+        <td data-editable="true">${marks.preTech || ''}</td><td>${marks.preTechLev || ''}</td>
+        <td data-editable="true">${marks.kiswahili || ''}</td><td>${marks.kiswahiliLev || ''}</td>
+        <td data-editable="true">${marks.science || ''}</td><td>${marks.scienceLev || ''}</td>
+        <td data-editable="true">${marks.social || ''}</td><td>${marks.socialLev || ''}</td>
+        <td data-editable="true">${marks.agriculture || ''}</td><td>${marks.agricultureLev || ''}</td>
+        <td data-editable="true">${marks.cre || ''}</td><td>${marks.creLev || ''}</td>
+        <td data-editable="true">${marks.creativeArt || ''}</td><td>${marks.creativeArtLev || ''}</td>
+        <td><strong>${rowTotal}</strong></td>
+        <td>
+          <button class="deleteMarksBtn" data-key="${learner.key}" data-exam="${examPeriod}">
+            <i class="fas fa-trash-alt"></i> Delete Marks
+          </button>
+        </td>
+      `;
+
+      marksTableBody.appendChild(row);
+    });
+
+    // 👌 Enable inline editing if admin is logged in
+    if (isAdminLoggedIn) enableMarksEditing();
+
     populateGradeSelectors(grades);
-    updateTotalsAndAverages(sums, learnersWithMarks);
+    updateTotalsAndAverages(sums, learnersArray.length);
   });
 }
 
+
+
+
 // Attach to button click
 document.getElementById("loadMarksByPeriodBtn").addEventListener("click", loadMarksFromFirebase);
+function loadAllGrades() {
+  const grades = new Set();
+  onValue(learnersRef, (snapshot) => {
+    snapshot.forEach(childSnapshot => {
+      const data = childSnapshot.val();
+      if (data.grade) {
+        grades.add(data.grade);
+      }
+    });
+    populateGradeSelectors(grades);
+  });
+}
+
+window.addEventListener("DOMContentLoaded", loadAllGrades);
 
 
 // ? Helper function   populate all grade dropdown selectors at once
@@ -2614,7 +2654,7 @@ function generateSubjectChampionsReport(selectedGrade, selectedExamPeriod) {
             <h2 style="margin: 0;">NACHU JUNIOR SCHOOL SUBJECT CHAMPIONS REPORT</h2>
             <p style="margin: 5px 0;">Address: P.O. Box 561-00902, Kikuyu, Kenya</p>
             <p style="margin: 5px 0;">Phone: +254-700-123456</p>
-            <p style="margin: 5px 0;">School Motto: "Excellence Through Knowledge"</p>
+            <p style="margin: 5px 0;">School Motto: "Hard Work Pays"</p>
             <p style="margin: 5px 0;">Year: ${year}</p>
             <p style="margin: 5px 0;">Grade: ${selectedGrade || 'All Grades'}</p>
             <p style="margin: 5px 0;">Exam Period: ${selectedExamPeriod || 'All Periods'}</p>
@@ -2731,7 +2771,7 @@ function generateLevelSummary(selectedGrade, selectedExamPeriod) {
             <h2 style="margin: 0;">NACHU JUNIOR SCHOOL SUBJECT LEVEL SUMMARY REPORT</h2>
             <p style="margin: 5px 0;">Address: P.O. Box 561-00902, Kikuyu, Kenya</p>
             <p style="margin: 5px 0;">Phone: +254-700-123456</p>
-            <p style="margin: 5px 0;">School Motto: "Excellence Through Knowledge"</p>
+            <p style="margin: 5px 0;">School Motto: "Hard Work Pays"</p>
             <p style="margin: 5px 0;">Year: ${year}</p>
             <p style="margin: 5px 0;">Grade: ${selectedGrade || 'All Grades'}</p>
             <p style="margin: 5px 0;">Exam Period: ${selectedExamPeriod || 'All Periods'}</p>
@@ -2948,7 +2988,7 @@ function generateSubjectPerformance(selectedGrade, selectedExamPeriod) {
             <img src="https://i.imgur.com/2bSAbwq.jpeg" alt="School Logo" style="display: block; margin: 0 auto 10px; max-width: 80px; height: auto;">
             <h2 style="margin: 0;">NACHU JUNIOR SCHOOL SUBJECT PERFORMANCE REPORT</h2>
             <p style="margin: 5px 0;">Address: P.O. Box 561-00902, Kikuyu, Kenya</p>
-            <p style="margin: 5px 0;">School Motto: "Excellence Through Knowledge"</p>
+            <p style="margin: 5px 0;">School Motto: "Hard Work Pays"</p>
             <p style="margin: 5px 0;">Year: ${year}</p>
             <p style="margin: 5px 0;">Grade: ${selectedGrade || 'All Grades'}</p>
             <p style="margin: 5px 0;">Exam Period: ${selectedExamPeriod || 'All Periods'}</p>
@@ -3078,7 +3118,7 @@ function generateReport(reportType, selectedGrade, examPeriod) {
             <img src="https://i.imgur.com/2bSAbwq.jpeg" alt="School Logo" style="display: block; margin: 0 auto 10px; max-width: 80px; height: auto;">
             <h2 style="margin: 0;">NACHU JUNIOR SCHOOL REPORT</h2>
             <p style="margin: 5px 0;">Address: P.O. Box 561-00902, Kikuyu, Kenya</p>
-            <p style="margin: 5px 0;">School Motto: "Excellence Through Knowledge"</p>
+            <p style="margin: 5px 0;">School Motto: "Hard Work Pays"</p>
             <p style="margin: 5px 0;">Year: ${year}</p>
             <p style="margin: 5px 0;">Grade: ${selectedGrade || 'All'}</p>
             <p style="margin: 5px 0;">Exam Period: ${examPeriod || 'All'}</p>
@@ -3243,7 +3283,7 @@ function generateGenderPerformance(selectedGrade, selectedExamPeriod) {
             <h2 style="margin: 0;">NACHU JUNIOR SCHOOL GENDER PERFORMANCE REPORT</h2>
             <p style="margin: 5px 0;">Address: P.O. Box 561-00902, Kikuyu, Kenya</p>
             <p style="margin: 5px 0;">Phone: +254-700-123456</p>
-            <p style="margin: 5px 0;">School Motto: "Excellence Through Knowledge"</p>
+            <p style="margin: 5px 0;">School Motto: "Hard Work Pays"</p>
             <p style="margin: 5px 0;">Year: ${year}</p>
             <p style="margin: 5px 0;">Grade: ${selectedGrade || 'All Grades'}</p>
             <p style="margin: 5px 0;">Exam Period: ${selectedExamPeriod || 'All Periods'}</p>
@@ -3853,7 +3893,7 @@ if (learnersData.length === 0) {
             <img src="https://i.imgur.com/2bSAbwq.jpeg" alt="School Logo" style="display: block; margin: 0 auto 10px; max-width: 80px; height: auto;">
            <h2 style="margin: 0;">NACHU JUNIOR SCHOOL COMBINED MARKS REPORT</h2>
             <p>Address: P.O. Box 561-00902, Kikuyu, Kenya</p>
-            <p>School Motto: "Excellence Through Knowledge"</p>
+            <p>School Motto: "Hard Work Pays"</p>
             <p>Year: ${year}</p>
             <p>Grade: ${mainGrade}</p>
             <p>Exam Period: ${selectedPeriod}</p>
@@ -4373,7 +4413,7 @@ function generatePathwayGrouping(selectedGrade, selectedExamPeriod) {
             <h2 style="margin: 0;">NACHU JUNIOR SCHOOL PATHWAY REPORT</h2>
             <p style="margin: 5px 0;">Address: P.O. Box 561-00902, Kikuyu, Kenya</p>
             <p style="margin: 5px 0;">Phone: +254-700-123456</p>
-            <p style="margin: 5px 0;">School Motto: "Excellence Through Knowledge"</p>
+            <p style="margin: 5px 0;">School Motto: "Hard Work Pays"</p>
             <p style="margin: 5px 0;">Year: ${year}</p>
             <p style="margin: 5px 0;">Grade: ${selectedGrade || 'All'} | Period: ${selectedExamPeriod || 'All'}</p>
         </div>`;
@@ -4928,7 +4968,7 @@ function countMarksStatusPerGrade() {
                     <img src="${logoUrl}" alt="School Logo" class="logo">
                     <h2>NACHU JUNIOR SCHOOL MARKS CAPTURE Report</h2>
                     <p>ADDRESS: P.O. BOX 561-00902 Kikuyu KENYA</p>
-                    <p>School Motto: "Excellence Through Knowledge"</p>
+                    <p>School Motto: "Hard Work Pays"</p>
                     <p>Year: ${year}</p>
                     ${tableHTML}
 
@@ -5176,7 +5216,7 @@ function generateSubjectRanking(grade, subjectKey, period) {
       <img src="https://i.imgur.com/2bSAbwq.jpeg" alt="School Logo" style="display: block; margin: 0 auto 10px; max-width: 80px; height: auto;">
       <h2 style="margin: 0;">NACHU JUNIOR SCHOOL SUBJECT RANKING REPORT</h2>
       <p style="margin: 5px 0;">Address: P.O. Box 561-00902, Kikuyu, Kenya</p>
-      <p style="margin: 5px 0;">School Motto: "Excellence Through Knowledge"</p>
+      <p style="margin: 5px 0;">School Motto: "Hard Work Pays"</p>
       <p style="margin: 5px 0;">Year: ${year}</p>
       <p style="margin: 5px 0;">Grade: ${grade}</p>
       <p style="margin: 5px 0;">Exam Period: ${period}</p>
@@ -5250,12 +5290,12 @@ document.getElementById("loadMarksByPeriodBtn").addEventListener("click", () => 
 });
 function loadMarksTableForPeriod(examPeriod) {
   marksTableBody.innerHTML = "";
-  const grades = new Set();
-  let index = 1;
+  const gradeGroups = {};
 
   let sums = {
     eng: 0, math: 0, preTech: 0, kiswahili: 0,
-    science: 0, social: 0, agriculture: 0, cre: 0, creativeArt: 0, totalMarks: 0
+    science: 0, social: 0, agriculture: 0,
+    cre: 0, creativeArt: 0, totalMarks: 0
   };
 
   let learnersWithMarks = 0;
@@ -5269,9 +5309,7 @@ function loadMarksTableForPeriod(examPeriod) {
       const marks = marksData[examPeriod] || null;
 
       if (marks) {
-        learnersWithMarks++;
-
-        const rowTotal = 
+        const rowTotal =
           (parseFloat(marks.eng) || 0) +
           (parseFloat(marks.math) || 0) +
           (parseFloat(marks.preTech) || 0) +
@@ -5281,6 +5319,31 @@ function loadMarksTableForPeriod(examPeriod) {
           (parseFloat(marks.agriculture) || 0) +
           (parseFloat(marks.cre) || 0) +
           (parseFloat(marks.creativeArt) || 0);
+
+        const learnerObj = {
+          key: childSnapshot.key,
+          data,
+          marks,
+          rowTotal
+        };
+
+        const grade = data.grade;
+        if (!gradeGroups[grade]) {
+          gradeGroups[grade] = [];
+        }
+        gradeGroups[grade].push(learnerObj);
+      }
+    });
+
+    // For each grade group
+    Object.keys(gradeGroups).forEach(grade => {
+      const learners = gradeGroups[grade];
+      learners.sort((a, b) => b.rowTotal - a.rowTotal);
+
+      learners.forEach((learner, i) => {
+        learnersWithMarks++;
+
+        const { data, marks, rowTotal } = learner;
 
         sums.eng += (parseFloat(marks.eng) || 0);
         sums.math += (parseFloat(marks.math) || 0);
@@ -5293,34 +5356,35 @@ function loadMarksTableForPeriod(examPeriod) {
         sums.creativeArt += (parseFloat(marks.creativeArt) || 0);
         sums.totalMarks += rowTotal;
 
-        grades.add(data.grade);
+        const row = document.createElement("tr");
+   row.setAttribute("data-grade", data.grade);
+row.setAttribute("data-exam-period", examPeriod);
+row.setAttribute("data-key", learner.key);
 
-      const row = document.createElement("tr");
-row.setAttribute("data-grade", data.grade);
-row.setAttribute("data-exam-period", examPeriod); // ✅ ADD THIS LINE
 
-row.innerHTML = `
-  <td>${index++}</td>
-  <td>${data.name}</td>
-  <td>${data.grade}</td>
-  <td>${marks.eng}</td><td>${marks.engLev}</td>
-  <td>${marks.math}</td><td>${marks.mathLev}</td>
-  <td>${marks.preTech}</td><td>${marks.preTechLev}</td>
-  <td>${marks.kiswahili}</td><td>${marks.kiswahiliLev}</td>
-  <td>${marks.science}</td><td>${marks.scienceLev}</td>
-  <td>${marks.social}</td><td>${marks.socialLev}</td>
-  <td>${marks.agriculture}</td><td>${marks.agricultureLev}</td>
-  <td>${marks.cre}</td><td>${marks.creLev}</td>
-  <td>${marks.creativeArt}</td><td>${marks.creativeArtLev}</td>
-  <td><strong>${rowTotal}</strong></td>
-  <td><button class="deleteMarksBtn" data-key="${childSnapshot.key}" data-exam="${examPeriod}">Delete</button></td>
-`;
+        row.innerHTML = `
+          <td>${i + 1}</td>
+          <td>${data.name}</td>
+          <td>${data.grade}</td>
+          <td data-editable="true">${marks.eng}</td><td>${marks.engLev || ''}</td>
+          <td data-editable="true">${marks.math}</td><td>${marks.mathLev || ''}</td>
+          <td data-editable="true">${marks.preTech}</td><td>${marks.preTechLev || ''}</td>
+          <td data-editable="true">${marks.kiswahili}</td><td>${marks.kiswahiliLev || ''}</td>
+          <td data-editable="true">${marks.science}</td><td>${marks.scienceLev || ''}</td>
+          <td data-editable="true">${marks.social}</td><td>${marks.socialLev || ''}</td>
+          <td data-editable="true">${marks.agriculture}</td><td>${marks.agricultureLev || ''}</td>
+          <td data-editable="true">${marks.cre}</td><td>${marks.creLev || ''}</td>
+          <td data-editable="true">${marks.creativeArt}</td><td>${marks.creativeArtLev || ''}</td>
+          <td><strong>${rowTotal}</strong></td>
+          <td>
+            <button class="deleteMarksBtn" data-key="${learner.key}" data-exam="${examPeriod}">Delete</button>
+          </td>
+        `;
 
         marksTableBody.appendChild(row);
-      }
+      });
     });
 
-    // ? Update Totals and Averages in the table footer
     const divisor = learnersWithMarks > 0 ? learnersWithMarks : 1;
 
     document.getElementById("totalsRow").innerHTML = `
@@ -5352,9 +5416,11 @@ row.innerHTML = `
       <td><strong>${(sums.totalMarks / divisor).toFixed(2)}</strong></td>
       <td></td>
     `;
+
+    // 👌 Enable inline editing if admin is logged in
+    if (isAdminLoggedIn) enableMarksEditing();
   });
 }
-
 
 
 function showToast(message, type = 'info') {
@@ -5408,7 +5474,7 @@ function generateSubjectRankingPerLearner(selectedGrade, selectedPeriod) {
             <img src="https://i.imgur.com/2bSAbwq.jpeg" alt="School Logo" style="display: block; margin: 0 auto 10px; max-width: 80px; height: auto;">
             <h2 style="margin: 0;">NACHU JUNIOR SCHOOL SUBJECT RANKING REPORT</h2>
             <p style="margin: 5px 0;">Address: P.O. Box 561-00902, Kikuyu, Kenya</p>
-            <p style="margin: 5px 0;">School Motto: "Excellence Through Knowledge"</p>
+            <p style="margin: 5px 0;">School Motto: "Hard Work Pays"</p>
             <p style="margin: 5px 0;">Year: ${year}</p>
             <p style="margin: 5px 0;">Grade: ${selectedGrade}</p>
             <p style="margin: 5px 0;">Exam Period: ${selectedPeriod}</p>
@@ -5517,6 +5583,97 @@ function generateSubjectRankingPerLearner(selectedGrade, selectedPeriod) {
   enableEnterAsTab('#marksForm');        // Marks form
   enableEnterAsTab('#learnersList');     // Registered Learners table rows
 
+
+// === ADMIN LOGIN LOGIC ===
+const adminCredentials = {
+  username: 'admin',
+  password: 'admin123'
+};
+
+let isAdminLoggedIn = false;
+
+document.getElementById("loginForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  if (username === adminCredentials.username && password === adminCredentials.password) {
+    document.getElementById("loginSection").style.display = "none";
+    document.getElementById("mainContent").style.display = "block";
+    isAdminLoggedIn = true;
+document.getElementById("saveEditedMarksBtn").style.display = "inline-block";
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Login Successful',
+      text: 'Welcome, Admin!',
+      timer: 1500,
+      showConfirmButton: false
+    });
+  } else {
+    document.getElementById("loginError").style.display = "block";
+  }
+});
+
+// === ENABLE MARKS EDITING FOR ADMIN + AUTO-SAVE ===
+function enableMarksEditing() {
+  if (!isAdminLoggedIn) return;
+
+  const cells = document.querySelectorAll("#marksList td[data-editable='true']");
+  cells.forEach(cell => {
+    cell.contentEditable = true;
+    cell.style.backgroundColor = "#fff8dc";
+    cell.style.border = "1px solid #ff9800";
+
+    // Auto-save when cell loses focus
+    cell.addEventListener("blur", function () {
+      const row = cell.closest("tr");
+      const learnerKey = row.getAttribute("data-key");
+      const examPeriod = marksExamPeriodSelect.value;
+      if (!learnerKey || !examPeriod) return;
+
+      const cellValues = row.querySelectorAll("td[data-editable='true']");
+      if (cellValues.length < 9) {
+        console.warn(`Skipping ${learnerKey} — not enough editable cells.`);
+        return;
+      }
+
+      const marks = {
+        eng: parseFloat(cellValues[0].innerText) || 0,
+        math: parseFloat(cellValues[1].innerText) || 0,
+        preTech: parseFloat(cellValues[2].innerText) || 0,
+        kiswahili: parseFloat(cellValues[3].innerText) || 0,
+        science: parseFloat(cellValues[4].innerText) || 0,
+        social: parseFloat(cellValues[5].innerText) || 0,
+        agriculture: parseFloat(cellValues[6].innerText) || 0,
+        cre: parseFloat(cellValues[7].innerText) || 0,
+        creativeArt: parseFloat(cellValues[8].innerText) || 0
+      };
+
+      const learnerMarksRef = ref(database, `learners/${learnerKey}/marks/${examPeriod}`);
+      update(learnerMarksRef, marks)
+        .then(() => {
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: 'Mark updated',
+            showConfirmButton: false,
+            timer: 1200
+          });
+        })
+        .catch(error => {
+          console.error(`❌ Error updating ${learnerKey}:`, error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Failed to update mark.',
+            text: 'Check your connection or permissions.',
+            timer: 2000
+          });
+        });
+    });
+  });
+}
 
 
 </script>
