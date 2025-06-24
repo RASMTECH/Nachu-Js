@@ -4737,7 +4737,6 @@ setupToggle(
   function showResetPasswordForm() {
     alert("Reset password feature coming soon.");
   }
-
 document.getElementById("printFilteredMarksBtn").addEventListener("click", () => {
     const visibleRows = Array.from(document.querySelectorAll("#marksList tr"))
         .filter(row => row.style.display !== "none");
@@ -4756,6 +4755,28 @@ document.getElementById("printFilteredMarksBtn").addEventListener("click", () =>
         const cells = Array.from(row.cells).slice(0, row.cells.length - 1); // Remove last <td>
         return `<tr>${cells.map(cell => `<td>${cell.innerHTML}</td>`).join("")}</tr>`;
     });
+
+    // Compute totals and averages, including Total Marks column
+    const scoreColumns = [3, 5, 7, 9, 11, 13, 15, 17, 19]; // Indices of score columns
+    const totals = Array.from({ length: scoreColumns.length }, () => 0);
+    let totalMarksSum = 0;
+
+    visibleRows.forEach(row => {
+        let rowTotal = 0;
+        scoreColumns.forEach((colIndex, index) => {
+            const cell = row.cells[colIndex];
+            const value = parseFloat(cell.innerText) || 0;
+            totals[index] += value;
+            rowTotal += value;
+        });
+        totalMarksSum += rowTotal;
+    });
+
+    const learnerCount = visibleRows.length;
+    const totalsRow = `<tr><td colspan="3">Total</td>${scoreColumns.map((_, index) => `<td>${totals[index]}</td><td></td>`).join("")}
+        <td>${totalMarksSum}</td><td></td></tr>`;
+    const averagesRow = `<tr><td colspan="3">Average</td>${scoreColumns.map((_, index) => `<td>${(totals[index] / learnerCount).toFixed(2)}</td><td></td>`).join("")}
+        <td>${(totalMarksSum / learnerCount).toFixed(2)}</td><td></td></tr>`;
 
     const tableHtml = `
         <table style="width: 100%; border-collapse: collapse;">
@@ -4778,6 +4799,8 @@ document.getElementById("printFilteredMarksBtn").addEventListener("click", () =>
             </thead>
             <tbody>
                 ${cleanedRows.join("")}
+                ${totalsRow}
+                ${averagesRow}
             </tbody>
         </table>
     `;
@@ -4823,6 +4846,7 @@ document.getElementById("printFilteredMarksBtn").addEventListener("click", () =>
     printWindow.document.close();
     printWindow.print();
 });
+
 
 function printAssessmentReport() {
     const reportContainer = document.getElementById("assessmentReportsContainer");
