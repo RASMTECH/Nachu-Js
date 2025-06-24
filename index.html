@@ -4768,7 +4768,7 @@ document.getElementById("printFilteredMarksBtn").addEventListener("click", () =>
 
     const selectedGrade = document.getElementById("filterMarksGrade").value || "All";
     const year = new Date().getFullYear();
-    const term = document.getElementById("term")?.value || "Term 1";
+    const term = document.getElementById("term")?.value || "Term 2";
 
     // Extract clean row data excluding the last column (Delete button)
     const cleanedRows = visibleRows.map(row => {
@@ -5196,7 +5196,7 @@ function generateBlankMeritLists(learnersSnapshot, selectedGrade) {
         return;
     }
 
-    const term = "Term 2";
+    const term = "Term 1";
     const year = new Date().getFullYear();
     const schoolName = "NACHU JUNIOR SCHOOL";
     const logoUrl = "https://i.imgur.com/2bSAbwq.jpeg";
