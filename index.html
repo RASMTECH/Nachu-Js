@@ -562,6 +562,33 @@ button[onclick^="show"] {
         font-size: 14px;
     }
 }
+.btn-blue {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-blue:hover {
+    background-color: #0056b3;
+}
+
+.btn-red {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-red:hover {
+    background-color: #a71d2a;
+}
 
     </style>
 </head>
@@ -834,41 +861,59 @@ button[onclick^="show"] {
 <div id="tableContainer" style="display: none; margin-top: 20px;">
   <h2>Registered Learners</h2>
 
-  <!-- Filter Bar -->
-  <div class="filter-bar">
-    <input type="text" id="searchInput" placeholder="Search by Name or Admission Number">
-    <select id="filterGrade">
-      <option value="">Filter by Grade</option>
-    </select>
-    <select id="filterGender">
-      <option value="">Filter by Gender</option>
-      <option value="Male">Male</option>
-      <option value="Female">Female</option>
-    </select>
-  </div>
+<!-- Filter Bar -->
+<div class="filter-bar" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+  <input 
+    type="text" 
+    id="searchInput" 
+    placeholder="Search Name / Adm No"
+    style="padding: 6px 8px; border: 2px solid #007BFF; border-radius: 5px; background-color: #e9f2ff; color: #333; font-size: 13px; min-width: 180px;"
+  >
 
-  <!-- Action Buttons -->
-  <div class="action-buttons" style="margin-top: 15px;">
-    <button class="print-button" id="printButton">
-      <i class="fas fa-print"></i> Print Filtered Learners
-    </button>
-    <button class="print-button" id="printGroupedByGenderButton">
-      <i class="fas fa-venus-mars"></i> Print Grouped by Gender
-    </button>
-    <button class="print-button" id="generateParentsListBtn">
-      <i class="fas fa-users"></i> Generate Parents List
-    </button>
-    <button class="print-button" id="toggleClassListSectionBtn">
-      <i class="fas fa-chevron-down"></i> Class List Generator
-    </button>
-<button class="print-button" onclick="promoteLearners()">
-  <i class="fas fa-level-up-alt"></i> Promote Learners
-</button>
-<button class="print-button" onclick="undoPromotion()">
-  <i class="fas fa-undo-alt"></i> Undo Promotion
-</button>
+  <select 
+    id="filterGrade"
+    style="padding: 6px 8px; border: 2px solid #28a745; border-radius: 5px; background-color: #e9ffe9; color: #333; font-size: 13px; width: 130px;"
+  >
+    <option value="">Filter by Grade</option>
+  </select>
 
-  </div>
+  <select 
+    id="filterGender"
+    style="padding: 6px 8px; border: 2px solid #ffc107; border-radius: 5px; background-color: #fff8e1; color: #333; font-size: 13px; width: 130px;"
+  >
+    <option value="">Filter by Gender</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+  </select>
+</div>
+
+
+ <!-- Action Buttons -->
+<div class="action-buttons" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px;">
+  <button class="print-button action-btn" id="printButton">
+    <i class="fas fa-print"></i> Print Filtered Learners
+  </button>
+  
+  <button class="print-button action-btn" id="printGroupedByGenderButton">
+    <i class="fas fa-venus-mars"></i> Print Grouped by Gender
+  </button>
+  
+  <button class="print-button action-btn" id="generateParentsListBtn">
+    <i class="fas fa-users"></i> Generate Parents List
+  </button>
+  
+  <button class="print-button action-btn" id="toggleClassListSectionBtn">
+    <i class="fas fa-chevron-down"></i> Class List Generator
+  </button>
+  
+  <button class="print-button action-btn" onclick="promoteLearners()">
+    <i class="fas fa-level-up-alt"></i> Promote Learners
+  </button>
+  
+  <button class="print-button action-btn" onclick="undoPromotion()">
+    <i class="fas fa-undo-alt"></i> Undo Promotion
+  </button>
+</div>
 
   <!-- Learners Table -->
   <table class="learners-table" style="margin-top: 20px;">
@@ -1952,7 +1997,7 @@ onValue(learnersRef, (snapshot) => {
         newRow.setAttribute('data-grade', data.grade);
         newRow.innerHTML = `
             <td>${index++}</td>
-            <td><img src="${data.photo || 'default.png'}" alt="Photo"></td>
+            <td><img src="${data.photo || 'default.png'}" alt="Photo" width="60" height="60" class="learner-photo"></td>
             <td contenteditable="true" class="editable">${data.name || ''}</td>
             <td contenteditable="true" class="editable">${data.gender || ''}</td>
             <td contenteditable="true" class="editable">${data.grade || ''}</td>
@@ -1962,68 +2007,120 @@ onValue(learnersRef, (snapshot) => {
             <td contenteditable="true" class="editable">${data.birthCert || ''}</td>
             <td contenteditable="true" class="editable">${data.admissionNo || ''}</td>
             <td>
-                <button class="edit-photo-btn" data-key="${learnerKey}">
-                    <i class="fas fa-camera"></i> Edit Photo
-                </button>
-            </td>
-            <td>
-                <button class="delete-btn" data-key="${learnerKey}">
-                    <i class="fas fa-trash-alt"></i> Delete
-                </button>
-            </td>
+  
+    <button class="edit-photo-btn btn-blue" data-key="${learnerKey}">
+        <i class="fas fa-camera"></i> Edit Photo
+    </button>
+</td>
+<td>
+    <button class="delete-btn btn-red" data-key="${learnerKey}">
+        <i class="fas fa-trash-alt"></i> Delete
+    </button>
+</td>
+
         `;
 
         tableBody.appendChild(newRow);
+// 🔄 Handle inline cell editing (Admin only)
+newRow.querySelectorAll('.editable').forEach(cell => {
+    const fieldIndex = cell.cellIndex;
+    const fieldNames = ['name', 'gender', 'grade', 'age', 'parentName', 'parentPhone', 'birthCert', 'admissionNo'];
+    const fieldName = fieldNames[fieldIndex - 2];
+    cell.setAttribute('data-original-field', fieldName);
 
-        // 🔄 Handle inline cell editing
-        newRow.querySelectorAll('.editable').forEach(cell => {
-            cell.addEventListener('blur', () => {
-                const fieldIndex = cell.cellIndex;
-                const fieldNames = ['name', 'gender', 'grade', 'age', 'parentName', 'parentPhone', 'birthCert', 'admissionNo'];
-                const fieldName = fieldNames[fieldIndex - 2];
-                const value = cell.textContent.trim();
+    cell.addEventListener('blur', () => {
+        if (!isAdminLoggedIn) {
+            showToast("Only admins can update learner details.", "error");
+            cell.textContent = data[fieldName] || '';
+            return;
+        }
 
-                if (!fieldName || value === '') {
-                    showToast("Field cannot be empty.", "error");
-                    return;
-                }
+        const value = cell.textContent.trim();
+        if (!fieldName || value === '') {
+            showToast("Field cannot be empty.", "error");
+            return;
+        }
 
-                const updatedLearner = {
-                    ...data,
-                    [fieldName]: value
-                };
+        const updatedLearner = { ...data, [fieldName]: value };
 
-                set(ref(database, `learners/${learnerKey}`), updatedLearner)
-                    .then(() => showToast(`${fieldName} updated successfully!`, "success"))
-                    .catch(err => {
-                        console.error("Error updating learner:", err);
-                        showToast("Failed to update learner. Please try again.", "error");
-                    });
+        set(ref(database, `learners/${learnerKey}`), updatedLearner)
+            .then(() => showToast(`${fieldName} updated successfully!`, "success"))
+            .catch(err => {
+                console.error("Error updating learner:", err);
+                showToast("Failed to update learner. Please try again.", "error");
             });
+    });
+});
+
+// ✅ 📸 Edit Photo (Admin only) — now moved **outside** the `.editable` loop
+const editPhotoBtn = newRow.querySelector(".edit-photo-btn");
+editPhotoBtn.addEventListener("click", () => {
+    if (!isAdminLoggedIn) {
+        Swal.fire("Access Denied", "Only admins can update learner photos.", "error");
+        return;
+    }
+
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
+    fileInput.click();
+
+    fileInput.addEventListener("change", () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const updatedLearner = { ...data, photo: reader.result };
+            set(ref(database, `learners/${learnerKey}`), updatedLearner)
+                .then(() => {
+                    // update image src immediately
+                    newRow.querySelector("img.learner-photo").src = reader.result;
+                    showToast("Photo updated successfully!", "success");
+                })
+                .catch((err) => {
+                    console.error("Error updating photo:", err);
+                    showToast("Failed to update photo.", "error");
+                });
+        };
+        reader.readAsDataURL(file);
+    });
+});
+
+    // ❌ SweetAlert2 delete confirmation (Admin only)
+newRow.querySelector('.delete-btn').addEventListener('click', (e) => {
+    if (!isAdminLoggedIn) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Access Denied',
+            text: 'Only admins can delete learner records.',
+            confirmButtonColor: '#d33'
         });
+        return;
+    }
 
-        // ❌ SweetAlert2 delete confirmation
-        newRow.querySelector('.delete-btn').addEventListener('click', (e) => {
-            const learnerKey = e.currentTarget.getAttribute('data-key');
+    const learnerKey = e.currentTarget.getAttribute('data-key');
 
-            Swal.fire({
-                title: 'Confirm Deletion',
-                text: 'Are you sure you want to permanently delete this learner?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete',
-                cancelButtonText: 'Cancel'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    remove(ref(database, `learners/${learnerKey}`))
-                        .then(() => {
-                            Swal.fire('Deleted!', 'Learner has been deleted.', 'success');
-                        })
-                        .catch(err => {
-                            console.error("Error deleting learner:", err);
-                            Swal.fire('Error', 'Failed to delete learner.', 'error');
+    Swal.fire({
+        title: 'Confirm Deletion',
+        text: 'Are you sure you want to permanently delete this learner?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            remove(ref(database, `learners/${learnerKey}`))
+                .then(() => {
+                    Swal.fire('Deleted!', 'Learner has been deleted.', 'success');
+                })
+                .catch(err => {
+                    console.error("Error deleting learner:", err);
+                    Swal.fire('Error', 'Failed to delete learner.', 'error');
+       
+
                         });
                 }
             });
@@ -2673,8 +2770,19 @@ function getLevel(score) {
     if (score >= 11) return "BE 1";
     return "BE 2";
 }
+
 document.addEventListener("click", function (e) {
   if (e.target.classList.contains("deleteMarksBtn")) {
+    if (!isAdminLoggedIn) {
+      Swal.fire({
+        icon: "error",
+        title: "Access Denied",
+        text: "Only admins can delete learner marks.",
+        confirmButtonColor: "#d33"
+      });
+      return;
+    }
+
     const button = e.target;
     const learnerKey = button.getAttribute("data-key");
     const examPeriod = button.getAttribute("data-exam");
@@ -2684,7 +2792,6 @@ document.addEventListener("click", function (e) {
       return;
     }
 
-    // SweetAlert2 confirmation dialog
     Swal.fire({
       title: "Are you sure?",
       text: "You want to delete this learner's marks for this exam?",
@@ -2699,7 +2806,6 @@ document.addEventListener("click", function (e) {
 
         set(learnerMarksRef, null)
           .then(() => {
-            // Success toast
             Swal.fire({
               toast: true,
               position: 'top-end',
@@ -2709,11 +2815,10 @@ document.addEventListener("click", function (e) {
               timer: 3000,
               timerProgressBar: true
             });
-            loadMarksFromFirebase();  // Refresh table
+            loadMarksFromFirebase(); // Refresh table
           })
           .catch(err => {
             console.error("Error deleting marks: ", err);
-            // Error toast
             Swal.fire({
               toast: true,
               position: 'top-end',
@@ -2749,9 +2854,6 @@ document.getElementById("subjectChampionsBtn").addEventListener("click", () => {
 
   generateSubjectChampionsReport(grade, examPeriod);
 });
-
-
-
 document.getElementById("subjectPerformanceBtn").addEventListener("click", () => {
     const grade = document.getElementById("reportGradeSelect").value;
     const examPeriod = document.getElementById("reportExamPeriodSelect").value;
@@ -2822,6 +2924,7 @@ function generateSubjectChampionsReport(selectedGrade, selectedExamPeriod) {
         .sort((a, b) => b.score - a.score);
 
     const top3 = sortedChampions.slice(0, 3);
+    const medals = ['🥇', '🥈', '🥉'];
     const year = new Date().getFullYear();
     const today = new Date();
     const printDate = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
@@ -2850,13 +2953,15 @@ function generateSubjectChampionsReport(selectedGrade, selectedExamPeriod) {
             <tbody>`;
 
     let count = 1;
-    sortedChampions.forEach(({ subject, name, score }) => {
+    sortedChampions.forEach(({ subject, name, score }, index) => {
         const level = getLevel(score);
-        const isTop = top3.find(top => top.subject === subject);
-        html += `<tr style="${isTop ? 'background: #FFD700; font-weight: bold;' : ''}">
+        const isTop = index < 3;
+        const medal = isTop ? medals[index] + ' 🎉' : '✨';
+        const rowStyle = isTop ? 'background: #FFD700; font-weight: bold;' : '';
+        html += `<tr style="${rowStyle}">
             <td style="border: 2px solid black; padding: 10px;">${count++}</td>
             <td style="border: 2px solid black; padding: 10px;">${subject}</td>
-            <td style="border: 2px solid black; padding: 10px;">${name}</td>
+            <td style="border: 2px solid black; padding: 10px;">${medal} ${name}</td>
             <td style="border: 2px solid black; padding: 10px;">${score >= 0 ? score : 'N/A'}</td>
             <td style="border: 2px solid black; padding: 10px;">${level}</td>
         </tr>`;
@@ -2867,6 +2972,81 @@ function generateSubjectChampionsReport(selectedGrade, selectedExamPeriod) {
     const reportOutput = document.getElementById("reportOutput");
     reportOutput.innerHTML = html;
 
+    // 🌀 Create animated style (once)
+    if (!document.getElementById("celebrationStyles")) {
+        const style = document.createElement("style");
+        style.id = "celebrationStyles";
+        style.textContent = `
+            @keyframes floatEffect {
+                0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+                100% { opacity: 0; transform: translateY(-100px) scale(1.5) rotate(720deg); }
+            }
+            @keyframes fadeZoomIn {
+                from { transform: scale(0.5); opacity: 0; }
+                to { transform: scale(1); opacity: 1; }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // 🎇 Floating emoji celebration
+    function launchCelebration() {
+        const emojis = ['✨', '🎉', '🥇', '🥈', '🥉', '🌟', '🔥', '💫'];
+        for (let i = 0; i < 60; i++) {
+            const span = document.createElement('span');
+            span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            span.style.position = 'fixed';
+            span.style.zIndex = 9999;
+            span.style.fontSize = `${Math.random() * 20 + 20}px`;
+            span.style.left = `${Math.random() * 100}vw`;
+            span.style.top = `${Math.random() * 100}vh`;
+            span.style.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+            span.style.pointerEvents = 'none';
+            span.style.animation = 'floatEffect 3s ease-out forwards';
+            document.body.appendChild(span);
+            setTimeout(() => span.remove(), 10000);
+        }
+    }
+
+    // 🏆 Pop-up champion names
+    function showChampionNamesPopup() {
+        const popup = document.createElement("div");
+        popup.style.position = "fixed";
+        popup.style.top = "50%";
+        popup.style.left = "50%";
+        popup.style.transform = "translate(-50%, -50%)";
+        popup.style.zIndex = 10000;
+        popup.style.background = "linear-gradient(to right, #fff8dc, #ffe680)";
+        popup.style.border = "4px solid gold";
+        popup.style.padding = "25px";
+        popup.style.borderRadius = "20px";
+        popup.style.fontSize = "22px";
+        popup.style.fontWeight = "bold";
+        popup.style.boxShadow = "0 0 25px gold";
+        popup.style.textAlign = "center";
+        popup.style.animation = "fadeZoomIn 1s ease, fadeOut 1s ease 9s";
+        popup.style.transition = "all 0.5s ease";
+
+        let content = `<div>🏆 Subject Champions 🏆<br><br>`;
+        sortedChampions.forEach(champ => {
+            content += `🎖️ <strong>${champ.subject}</strong>: ${champ.name}<br>`;
+        });
+        content += `</div>`;
+        popup.innerHTML = content;
+
+        document.body.appendChild(popup);
+        setTimeout(() => popup.remove(), 10000);
+    }
+
+    // 🚀 Trigger visuals
+    launchCelebration();
+    showChampionNamesPopup();
+
+    // 🖨️ Print button
     let printButton = document.getElementById("printSubjectChampionsBtn");
     if (!printButton) {
         printButton = document.createElement("button");
@@ -2923,6 +3103,7 @@ function generateSubjectChampionsReport(selectedGrade, selectedExamPeriod) {
 }
 
 
+
 function generateLevelSummary(selectedGrade, selectedExamPeriod) {
     const subjects = [
         'English', 'Mathematics', 'Pre-Technical Studies',
@@ -2937,11 +3118,13 @@ function generateLevelSummary(selectedGrade, selectedExamPeriod) {
     ];
 
     const levels = ['EE 1', 'EE 2', 'ME 1', 'ME 2', 'AE 1', 'AE 2', 'BE 1', 'BE 2'];
-
     const summary = {};
+    const topPerformers = {};
+
     subjects.forEach(subject => {
         summary[subject] = {};
         levels.forEach(level => summary[subject][level] = 0);
+        topPerformers[subject] = null;
     });
 
     const marksTableBody = document.getElementById("marksList");
@@ -2952,10 +3135,16 @@ function generateLevelSummary(selectedGrade, selectedExamPeriod) {
         if (selectedGrade && rowGrade !== selectedGrade) return;
         if (selectedExamPeriod && rowPeriod !== selectedExamPeriod) return;
 
+        const learnerName = row.cells[1].textContent;
+
         subjectKeys.forEach((key, i) => {
             const level = row.querySelector(`td:nth-child(${4 + i * 2 + 1})`)?.textContent;
             if (levels.includes(level)) {
                 summary[subjects[i]][level]++;
+                // Track top performer as first EE 1 or EE 2 found
+                if (!topPerformers[subjects[i]] && (level === 'EE 1' || level === 'EE 2')) {
+                    topPerformers[subjects[i]] = learnerName;
+                }
             }
         });
     });
@@ -2966,8 +3155,8 @@ function generateLevelSummary(selectedGrade, selectedExamPeriod) {
 
     let html = `
         <div class="header" style="text-align: center; margin-bottom: 20px;">
-            <img src="https://i.imgur.com/2bSAbwq.jpeg" alt="School Logo" style="display: block; margin: 0 auto 10px; max-width: 80px; height: auto;">
-            <h2 style="margin: 0;">NACHU JUNIOR SCHOOL SUBJECT LEVEL SUMMARY REPORT</h2>
+            <img src="https://i.imgur.com/2bSAbwq.jpeg" alt="School Logo" style="display: block; margin: 0 auto 10px; max-width: 80px;">
+            <h2>NACHU JUNIOR SCHOOL SUBJECT LEVEL SUMMARY REPORT</h2>
             <p>Address: P.O. Box 561-00902, Kikuyu, Kenya</p>
             <p>Phone: +254-700-123456</p>
             <p>School Motto: "My Talent My Passion"</p>
@@ -2975,7 +3164,7 @@ function generateLevelSummary(selectedGrade, selectedExamPeriod) {
             <p>Grade: ${selectedGrade || 'All Grades'}</p>
             <p>Exam Period: ${selectedExamPeriod || 'All Periods'}</p>
         </div>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 15px; background-color: white; color: black; font-size: 16px;">
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px; background: white; color: black; font-size: 16px;">
             <thead>
                 <tr style="background: #f2f2f2;">
                     <th style="border: 2px solid black; padding: 10px;">Subject</th>`;
@@ -2996,18 +3185,84 @@ function generateLevelSummary(selectedGrade, selectedExamPeriod) {
     });
 
     html += `</tbody></table>
-
-    <div class="stamp print-only" style="margin-top:40px;">
-        Nachu Junior School<br>
-        P.O. Box 561-00902, Kikuyu<br>
-        Exam Department<br>
-        Date: ${printDate}
-    </div>
-    `;
+        <div class="stamp print-only" style="margin-top:40px;">
+            Nachu Junior School<br>
+            P.O. Box 561-00902, Kikuyu<br>
+            Exam Department<br>
+            Date: ${printDate}
+        </div>`;
 
     const reportOutput = document.getElementById("reportOutput");
     reportOutput.innerHTML = html;
 
+    // Celebration Styles
+    if (!document.getElementById("levelSummaryStyles")) {
+        const style = document.createElement("style");
+        style.id = "levelSummaryStyles";
+        style.textContent = `
+            @keyframes floatUp {
+                0% { transform: translateY(0) scale(1); opacity: 1; }
+                100% { transform: translateY(-150px) scale(1.5); opacity: 0; }
+            }
+            @keyframes fadeZoom {
+                from { transform: scale(0.5); opacity: 0; }
+                to { transform: scale(1); opacity: 1; }
+            }
+            @keyframes fadeAway {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // Floating emoji
+    function floatCelebration() {
+        const emojis = ['🎇', '🎉', '🎊', '🏆', '🌟', '🥇', '✨', '💫'];
+        for (let i = 0; i < 60; i++) {
+            const span = document.createElement('span');
+            span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            span.style.position = 'fixed';
+            span.style.left = `${Math.random() * 100}vw`;
+            span.style.top = `${Math.random() * 100}vh`;
+            span.style.fontSize = `${20 + Math.random() * 20}px`;
+            span.style.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+            span.style.zIndex = 9999;
+            span.style.pointerEvents = 'none';
+            span.style.animation = 'floatUp 3s ease-out forwards';
+            document.body.appendChild(span);
+            setTimeout(() => span.remove(), 10000);
+        }
+    }
+
+    // Popup with top level learners
+    function showTopPopup() {
+        const popup = document.createElement("div");
+        popup.style.position = "fixed";
+        popup.style.top = "50%";
+        popup.style.left = "50%";
+        popup.style.transform = "translate(-50%, -50%)";
+        popup.style.background = "linear-gradient(to right, #fff8dc, #ffe680)";
+        popup.style.border = "4px solid gold";
+        popup.style.padding = "25px";
+        popup.style.borderRadius = "20px";
+        popup.style.fontSize = "22px";
+        popup.style.fontWeight = "bold";
+        popup.style.zIndex = 10000;
+        popup.style.boxShadow = "0 0 25px gold";
+        popup.style.animation = "fadeZoom 1s ease, fadeAway 1s ease 9s";
+        popup.innerHTML = `<div>🌟 Top Level Performers 🌟<br><br>` +
+            subjects.map(sub => `🏅 <strong>${sub}</strong>: ${topPerformers[sub] || 'None'}`).join("<br>") +
+            `</div>`;
+
+        document.body.appendChild(popup);
+        setTimeout(() => popup.remove(), 10000);
+    }
+
+    floatCelebration();
+    showTopPopup();
+
+    // Print button
     let printButton = document.getElementById("printLevelSummaryBtn");
     if (!printButton) {
         printButton = document.createElement("button");
@@ -3146,18 +3401,77 @@ function showSubjectRanking(selectedGrade, selectedExamPeriod) {
     }
 
     rankingsHtml += `
-    <div class="stamp print-only" style="margin-top: 40px;">
-        Nachu Junior School<br>
-        P.O. Box 561-00902, Kikuyu<br>
-        Exam Department<br>
-        Date: ${printDate}
-    </div>
+        <div class="stamp print-only" style="margin-top: 40px;">
+            Nachu Junior School<br>
+            P.O. Box 561-00902, Kikuyu<br>
+            Exam Department<br>
+            Date: ${printDate}
+        </div>
     `;
 
     const reportDiv = document.getElementById("report");
     reportDiv.innerHTML = rankingsHtml;
 
-    // Attach print button dynamically
+    // Celebration popup + emojis
+    const styleId = "rankingCelebrationStyle";
+    if (!document.getElementById(styleId)) {
+        const style = document.createElement("style");
+        style.id = styleId;
+        style.textContent = `
+            @keyframes floatUpRank {0%{transform:translateY(0)}100%{transform:translateY(-120px);opacity:0}}
+            @keyframes zoomInFade {from{transform:scale(0.5);opacity:0;} to{transform:scale(1);opacity:1;}}
+            @keyframes fadeOut {from{opacity:1;} to{opacity:0;}}
+        `;
+        document.head.appendChild(style);
+    }
+
+    function showFloatingEmojis() {
+        const emojis = ['🎉', '🏅', '🥇', '✨', '🌟', '🎊', '🏆', '🥈', '🥉'];
+        for (let i = 0; i < 50; i++) {
+            const e = document.createElement("span");
+            e.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            const size = 20 + Math.random() * 20;
+            e.style = `
+                position:fixed;left:${Math.random() * 100}vw;top:${Math.random() * 100}vh;
+                font-size:${size}px;z-index:9999;pointer-events:none;
+                color:hsl(${Math.random() * 360},100%,70%);
+                animation:floatUpRank 3s ease-out forwards;
+            `;
+            document.body.appendChild(e);
+            setTimeout(() => e.remove(), 5000);
+        }
+    }
+
+    async function showTop5Popups() {
+        for (const subject in rankings) {
+            const top5 = rankings[subject].slice(0, 5);
+            if (!top5.length) continue;
+            const popup = document.createElement("div");
+            popup.style = `
+                position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+                background:linear-gradient(to right,#fff8dc,#ffe680);
+                border:4px solid gold;padding:20px 30px;border-radius:20px;
+                font:bold 18px sans-serif;text-align:left;box-shadow:0 0 25px gold;
+                animation:zoomInFade 1s ease, fadeOut 1s ease 9s;
+                z-index:10000;
+            `;
+            popup.innerHTML = `<div>🎯 <strong>Top 5 in ${subject}</strong><br><br>${
+                top5.map((entry, i) =>
+                    `${i + 1}. <strong>${entry.name}</strong> - ${entry.score} (${getPerformanceLevel(entry.score)})`
+                ).join("<br>")
+            }</div>`;
+            document.body.appendChild(popup);
+            showFloatingEmojis();
+            await new Promise(resolve => setTimeout(() => {
+                popup.remove();
+                resolve();
+            }, 10000));
+        }
+    }
+
+    showTop5Popups();
+
+    // Print button
     let printButton = document.getElementById("printRankingBtn");
     if (!printButton) {
         printButton = document.createElement("button");
@@ -3196,9 +3510,7 @@ function showSubjectRanking(selectedGrade, selectedExamPeriod) {
                             }
                         </style>
                     </head>
-                    <body>
-                        ${reportDiv.innerHTML}
-                    </body>
+                    <body>${reportDiv.innerHTML}</body>
                 </html>
             `);
             printWindow.document.close();
@@ -3213,35 +3525,29 @@ function generateSubjectPerformance(selectedGrade, selectedExamPeriod) {
         'Kiswahili', 'Integrated Science', 'Social Studies',
         'Agriculture', 'Religious Education', 'Creative Art'
     ];
-
     const subjectKeys = [
         'eng', 'math', 'preTech',
         'kiswahili', 'science', 'social',
         'agriculture', 'cre', 'creativeArt'
     ];
-
     const subjectScores = {};
-    const marksTableBody = document.getElementById("marksList");
-
-    marksTableBody.querySelectorAll("tr").forEach(row => {
-        const rowGrade = row.getAttribute("data-grade");
-        const rowPeriod = row.getAttribute("data-exam-period");
-
-        if (selectedGrade && rowGrade !== selectedGrade) return;
-        if (selectedExamPeriod && rowPeriod !== selectedExamPeriod) return;
-
-        subjectKeys.forEach((key, index) => {
-            const score = parseFloat(row.cells[3 + index * 2].textContent);
-            if (!isNaN(score)) {
-                if (!subjectScores[subjects[index]]) {
-                    subjectScores[subjects[index]] = { total: 0, count: 0 };
+    const marks = document.getElementById("marksList");
+    marks.querySelectorAll("tr").forEach(row => {
+        const g = row.getAttribute("data-grade");
+        const p = row.getAttribute("data-exam-period");
+        if (selectedGrade && g !== selectedGrade) return;
+        if (selectedExamPeriod && p !== selectedExamPeriod) return;
+        subjectKeys.forEach((key, i) => {
+            const sc = parseFloat(row.cells[3 + i * 2].textContent);
+            if (!isNaN(sc)) {
+                if (!subjectScores[subjects[i]]) {
+                    subjectScores[subjects[i]] = { total: 0, count: 0 };
                 }
-                subjectScores[subjects[index]].total += score;
-                subjectScores[subjects[index]].count++;
+                subjectScores[subjects[i]].total += sc;
+                subjectScores[subjects[i]].count++;
             }
         });
     });
-
     function getLevel(score) {
         if (score >= 90) return "EE 1";
         if (score >= 75) return "EE 2";
@@ -3252,114 +3558,118 @@ function generateSubjectPerformance(selectedGrade, selectedExamPeriod) {
         if (score >= 11) return "BE 1";
         return "BE 2";
     }
-
-    const meanScores = Object.keys(subjectScores).map(subject => {
-        const { total, count } = subjectScores[subject];
-        const mean = count > 0 ? (total / count).toFixed(2) : "0.00";
-        return {
-            subject,
-            mean,
-            level: getLevel(mean)
-        };
+    const means = Object.keys(subjectScores).map(sub => {
+        const { total, count } = subjectScores[sub];
+        const mean = count > 0 ? total / count : 0;
+        return { subject: sub, mean: parseFloat(mean.toFixed(2)), level: getLevel(mean) };
     }).sort((a, b) => b.mean - a.mean);
-
-    const topSubjects = meanScores.slice(0, 3);
+    const top5 = means.slice(0, 5);
     const year = new Date().getFullYear();
     const today = new Date();
-    const printDate = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
-
+    const printDate = `${today.getDate()}-${today.getMonth()+1}-${year}`;
     let html = `
         <div style="text-align: center; margin-bottom: 20px;">
-            <img src="https://i.imgur.com/2bSAbwq.jpeg" alt="School Logo" style="display: block; margin: 0 auto 10px; max-width: 80px;">
-            <h2 style="margin: 0;">NACHU JUNIOR SCHOOL SUBJECT TRACKER ANALYSIS REPORT</h2>
-            <p>Address: P.O. Box 561-00902, Kikuyu, Kenya</p>
-            <p>School Motto: "My Talent My Passion"</p>
-            <p>Year: ${year}</p>
-            <p>Grade: ${selectedGrade || 'All Grades'}</p>
-            <p>Exam Period: ${selectedExamPeriod || 'All Periods'}</p>
+            <img src="https://i.imgur.com/2bSAbwq.jpeg" alt="Logo" style="max-width:80px;margin:0 auto 10px;">
+            <h2>NACHU JUNIOR SCHOOL SUBJECT TRACKER ANALYSIS REPORT</h2>
+            <p>Year: ${year} | Grade: ${selectedGrade || 'All'} | Period: ${selectedExamPeriod || 'All'}</p>
         </div>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 16px;">
-            <thead>
-                <tr style="background: #f2f2f2;">
-                    <th style="border: 2px solid black; padding: 10px;">No.</th>
-                    <th style="border: 2px solid black; padding: 10px;">Subject</th>
-                    <th style="border: 2px solid black; padding: 10px;">Mean Score</th>
-                    <th style="border: 2px solid black; padding: 10px;">Performance Level</th>
-                </tr>
-            </thead>
-            <tbody>`;
-
-    let count = 1;
-    meanScores.forEach(({ subject, mean, level }) => {
-        const isTop = topSubjects.find(top => top.subject === subject);
-        html += `<tr style="${isTop ? 'background: #FFD700; font-weight: bold;' : ''}">
-            <td style="border: 2px solid black; padding: 10px;">${count++}</td>
-            <td style="border: 2px solid black; padding: 10px;">${subject}</td>
-            <td style="border: 2px solid black; padding: 10px;">${mean}</td>
-            <td style="border: 2px solid black; padding: 10px;">${level}</td>
+        <table style="width:100%;border-collapse:collapse;font-size:16px;">
+            <thead><tr style="background:#f2f2f2;">
+                <th style="border:2px solid black;padding:10px;">No.</th>
+                <th style="border:2px solid black;padding:10px;">Subject</th>
+                <th style="border:2px solid black;padding:10px;">Mean Score</th>
+                <th style="border:2px solid black;padding:10px;">Level</th>
+            </tr></thead><tbody>`;
+    means.forEach((m, i) => {
+        const isTop = top5.find(t => t.subject === m.subject);
+        const style = isTop ? 'background:#FFD700;font-weight:bold;' : '';
+        html += `<tr style="${style}">
+            <td style="border:2px solid black;padding:10px;">${i+1}</td>
+            <td style="border:2px solid black;padding:10px;">${m.subject}</td>
+            <td style="border:2px solid black;padding:10px;">${m.mean}</td>
+            <td style="border:2px solid black;padding:10px;">${m.level}</td>
         </tr>`;
     });
-
     html += `</tbody></table>
+        <div class="stamp print-only" style="margin-top:30px;">
+            Nachu Junior School<br>Exam Dept — Date: ${printDate}
+        </div>`;
+    const out = document.getElementById("reportOutput");
+    out.innerHTML = html;
 
-    <div class="stamp print-only" style="margin-top: 30px;">
-        Nachu Junior School<br>
-        P.O. Box 561-00902, Kikuyu<br>
-        Exam Department<br>
-        Date: ${printDate}
-    </div>`;
+    // 🎨 Styles (once)
+    if (!document.getElementById("perfCelebrationStyles")) {
+        const s = document.createElement("style");
+        s.id = "perfCelebrationStyles";
+        s.textContent = `
+            @keyframes floatUpP {0%{transform:translateY(0) scale(1);}100%{transform:translateY(-150px) scale(1.5);opacity:0;}}
+            @keyframes zoomInFade {from{transform:scale(0.5);opacity:0;} to{transform:scale(1);opacity:1;}}
+            @keyframes fadeOut {from{opacity:1;}to{opacity:0;}}
+        `;
+        document.head.appendChild(s);
+    }
 
-    const reportOutput = document.getElementById("reportOutput");
-    reportOutput.innerHTML = html;
+    function showEmojis() {
+        const list = ['🎇','🎉','🥇','💫','🏆','🌟','🥈','🥉','✨'];
+        for (let i=0;i<60;i++){
+            const e = document.createElement("span");
+            const em = list[Math.floor(Math.random()*list.length)];
+            const size = 20 + Math.random() * 20;
+            e.textContent = em;
+            e.style = `position:fixed;left:${Math.random()*100}vw;top:${Math.random()*100}vh;
+                       font-size:${size}px;color:hsl(${Math.random()*360},100%,60%);
+                       animation:floatUpP 3s ease-out forwards;pointer-events:none;z-index:9999`;
+            document.body.appendChild(e);
+            setTimeout(() => e.remove(), 10000);
+        }
+    }
 
-    let printButton = document.getElementById("printSubjectPerformanceBtn");
-    if (!printButton) {
-        printButton = document.createElement("button");
-        printButton.id = "printSubjectPerformanceBtn";
-        printButton.className = "print-button";
-        printButton.innerHTML = '<i class="fas fa-print"></i> Print Report';
-        reportOutput.appendChild(printButton);
+    function showTop5Popup() {
+        const p = document.createElement("div");
+        p.style = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+                   background:linear-gradient(to right,#fff8dc,#ffe680);
+                   border:4px solid gold;padding:25px;border-radius:20px;
+                   font:bold 20px sans-serif;box-shadow:0 0 25px gold;
+                   animation:zoomInFade 1s ease,fadeOut 1s ease 9s;z-index:10000`;
+        p.innerHTML = `<div>🏅 Top 5 Subject Performance 🏅<br><br>${
+            top5.map((t,i)=>`${i+1}. <strong>${t.subject}</strong>: ${t.mean} (${t.level})`).join("<br>")
+        }</div>`;
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 10000);
+    }
 
-        printButton.addEventListener("click", () => {
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                    <head>
-                        <title>Subject Performance Report</title>
-                        <style>
-                            body { font-family: Arial, sans-serif; margin: 20px; }
-                            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-                            table, th, td { border: 2px solid black; padding: 8px; }
-                            th { background-color: #f4f4f4; font-weight: bold; }
-                            img { max-width: 100px; }
-                            .stamp {
-                                border: 2px solid blue;
-                                color: blue;
-                                width: 200px;
-                                height: 70px;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                margin: 20px auto;
-                                font-weight: bold;
-                                font-size: 14px;
-                                text-align: center;
-                            }
-                            @media screen {
-                                .stamp { display: none; }
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        ${reportOutput.innerHTML}
-                    </body>
-                </html>
-            `);
-            printWindow.document.close();
-            printWindow.print();
+    showEmojis();
+    showTop5Popup();
+
+    // 🖨️ Print
+    if (!document.getElementById("printSubjectPerformanceBtn")) {
+        const btn = document.createElement("button");
+        btn.id = "printSubjectPerformanceBtn";
+        btn.className = "print-button";
+        btn.innerHTML = '<i class="fas fa-print"></i> Print Report';
+        out.appendChild(btn);
+        btn.addEventListener("click", () => {
+            const w = window.open('', '_blank');
+            w.document.write(`
+                <html><head><title>Subject Performance Report</title>
+                <style>body{font-family:Arial;margin:20px}
+                    table{width:100%;border-collapse:collapse;margin-bottom:20px}
+                    th,td{border:2px solid black;padding:8px}
+                    th{background:#f4f4f4;font-weight:bold}
+                    img{max-width:100px}
+                    .stamp{text-align:center;border:2px solid blue;color:blue;margin:20px auto;
+                          width:200px;height:70px;display:flex;align-items:center;
+                          justify-content:center;font-weight:bold;font-size:14px}
+                    @media screen{.stamp{display:none}}
+                </style></head><body>
+                    ${out.innerHTML}
+                </body></html>`);
+            w.document.close();
+            w.print();
         });
     }
 }
+
 
 
 function generateReport(reportType, selectedGrade, examPeriod) {
@@ -3492,6 +3802,7 @@ function generateReport(reportType, selectedGrade, examPeriod) {
         });
     }
    }
+
 function generateGenderPerformance(selectedGrade, selectedExamPeriod) {
   const marksTableBody = document.getElementById("marksList");
   const learnersTableBody = document.getElementById("learnersList");
@@ -3550,7 +3861,6 @@ function generateGenderPerformance(selectedGrade, selectedExamPeriod) {
     });
 
   const genderPerformance = { male: [], female: [] };
-
   marks.forEach(entry => {
     const learner = learners.find(l => l.name === entry.learner);
     if (learner) {
@@ -3562,10 +3872,11 @@ function generateGenderPerformance(selectedGrade, selectedExamPeriod) {
   genderPerformance.male.sort((a, b) => b.totalMarks - a.totalMarks);
   genderPerformance.female.sort((a, b) => b.totalMarks - a.totalMarks);
 
-  function createTable(data, gender) {
-    if (!data.length) {
-      return `<h3 style="color:red;">No ${gender} learners found for selected criteria.</h3>`;
-    }
+  const top5Male = genderPerformance.male.slice(0, 5);
+  const top5Female = genderPerformance.female.slice(0, 5);
+
+  function createTable(data, gender, top5) {
+    if (!data.length) return `<h3 style="color:red;">No ${gender} learners found for selected criteria.</h3>`;
 
     const color = gender === "male" ? "blue" : "purple";
 
@@ -3576,46 +3887,45 @@ function generateGenderPerformance(selectedGrade, selectedExamPeriod) {
     };
 
     let html = `
-    <div id="${gender}-section" style="margin-top:40px;">
-    <h2 style="text-align:center; color:${color};">${gender.toUpperCase()} LEARNERS REPORT</h2>
-    <table style="width:100%; border-collapse:collapse; font-size:15px;">
-      <thead>
-        <tr style="background:#f4f4f4;">
-          <th style="border:2px solid black;">No.</th>
-          <th style="border:2px solid black;">Name</th>
-          <th style="border:2px solid black;">Grade</th>
-          <th style="border:2px solid black;">Eng</th><th style="border:2px solid black;">Lev</th>
-          <th style="border:2px solid black;">Math</th><th style="border:2px solid black;">Lev</th>
-          <th style="border:2px solid black;">PreTech</th><th style="border:2px solid black;">Lev</th>
-          <th style="border:2px solid black;">Kisw</th><th style="border:2px solid black;">Lev</th>
-          <th style="border:2px solid black;">Scie</th><th style="border:2px solid black;">Lev</th>
-          <th style="border:2px solid black;">SST</th><th style="border:2px solid black;">Lev</th>
-          <th style="border:2px solid black;">Agric</th><th style="border:2px solid black;">Lev</th>
-          <th style="border:2px solid black;">CRE</th><th style="border:2px solid black;">Lev</th>
-          <th style="border:2px solid black;">C/A</th><th style="border:2px solid black;">Lev</th>
-          <th style="border:2px solid black;">Total</th>
-        </tr>
-      </thead><tbody>
-    `;
+      <div id="${gender}-section" style="margin-top:40px;">
+      <h2 style="text-align:center; color:${color};">${gender.toUpperCase()} LEARNERS REPORT</h2>
+      <table style="width:100%; border-collapse:collapse; font-size:15px;">
+        <thead>
+          <tr style="background:#f4f4f4;">
+            <th style="border:2px solid black;">No.</th>
+            <th style="border:2px solid black;">Name</th>
+            <th style="border:2px solid black;">Grade</th>
+            <th style="border:2px solid black;">Eng</th><th>Lev</th>
+            <th style="border:2px solid black;">Math</th><th>Lev</th>
+            <th style="border:2px solid black;">PreTech</th><th>Lev</th>
+            <th style="border:2px solid black;">Kisw</th><th>Lev</th>
+            <th style="border:2px solid black;">Scie</th><th>Lev</th>
+            <th style="border:2px solid black;">SST</th><th>Lev</th>
+            <th style="border:2px solid black;">Agric</th><th>Lev</th>
+            <th style="border:2px solid black;">CRE</th><th>Lev</th>
+            <th style="border:2px solid black;">C/A</th><th>Lev</th>
+            <th style="border:2px solid black;">Total</th>
+          </tr>
+        </thead><tbody>`;
 
     data.forEach((entry, index) => {
-      html += `
-      <tr>
-        <td style="border:2px solid black;">${index + 1}</td>
-        <td style="border:2px solid black;">${entry.learner}</td>
-        <td style="border:2px solid black;">${entry.grade}</td>
-        <td style="border:2px solid black;">${entry.english}</td><td style="border:2px solid black;">${getLevel(entry.english)}</td>
-        <td style="border:2px solid black;">${entry.math}</td><td style="border:2px solid black;">${getLevel(entry.math)}</td>
-        <td style="border:2px solid black;">${entry.preTech}</td><td style="border:2px solid black;">${getLevel(entry.preTech)}</td>
-        <td style="border:2px solid black;">${entry.kiswahili}</td><td style="border:2px solid black;">${getLevel(entry.kiswahili)}</td>
-        <td style="border:2px solid black;">${entry.science}</td><td style="border:2px solid black;">${getLevel(entry.science)}</td>
-        <td style="border:2px solid black;">${entry.social}</td><td style="border:2px solid black;">${getLevel(entry.social)}</td>
-        <td style="border:2px solid black;">${entry.agriculture}</td><td style="border:2px solid black;">${getLevel(entry.agriculture)}</td>
-        <td style="border:2px solid black;">${entry.cre}</td><td style="border:2px solid black;">${getLevel(entry.cre)}</td>
-        <td style="border:2px solid black;">${entry.art}</td><td style="border:2px solid black;">${getLevel(entry.art)}</td>
-        <td style="border:2px solid black;"><strong>${entry.totalMarks}</strong></td>
-      </tr>
-      `;
+      const isTop = top5.find(t => t.learner === entry.learner);
+      const rowStyle = isTop ? "background:#FFD700;font-weight:bold;" : "";
+      html += `<tr style="${rowStyle}">
+        <td>${index + 1}</td>
+        <td>${entry.learner}</td>
+        <td>${entry.grade}</td>
+        <td>${entry.english}</td><td>${getLevel(entry.english)}</td>
+        <td>${entry.math}</td><td>${getLevel(entry.math)}</td>
+        <td>${entry.preTech}</td><td>${getLevel(entry.preTech)}</td>
+        <td>${entry.kiswahili}</td><td>${getLevel(entry.kiswahili)}</td>
+        <td>${entry.science}</td><td>${getLevel(entry.science)}</td>
+        <td>${entry.social}</td><td>${getLevel(entry.social)}</td>
+        <td>${entry.agriculture}</td><td>${getLevel(entry.agriculture)}</td>
+        <td>${entry.cre}</td><td>${getLevel(entry.cre)}</td>
+        <td>${entry.art}</td><td>${getLevel(entry.art)}</td>
+        <td><strong>${entry.totalMarks}</strong></td>
+      </tr>`;
 
       totals.english += entry.english;
       totals.math += entry.math;
@@ -3630,49 +3940,84 @@ function generateGenderPerformance(selectedGrade, selectedExamPeriod) {
     });
 
     const count = data.length;
-
     html += `
-    <tr style="background:yellow; font-weight:bold;">
-      <td colspan="3" style="border:2px solid black;">Totals</td>
-      <td style="border:2px solid black;">${totals.english}</td><td style="border:2px solid black;">-</td>
-      <td style="border:2px solid black;">${totals.math}</td><td style="border:2px solid black;">-</td>
-      <td style="border:2px solid black;">${totals.preTech}</td><td style="border:2px solid black;">-</td>
-      <td style="border:2px solid black;">${totals.kiswahili}</td><td style="border:2px solid black;">-</td>
-      <td style="border:2px solid black;">${totals.science}</td><td style="border:2px solid black;">-</td>
-      <td style="border:2px solid black;">${totals.social}</td><td style="border:2px solid black;">-</td>
-      <td style="border:2px solid black;">${totals.agriculture}</td><td style="border:2px solid black;">-</td>
-      <td style="border:2px solid black;">${totals.cre}</td><td style="border:2px solid black;">-</td>
-      <td style="border:2px solid black;">${totals.art}</td><td style="border:2px solid black;">-</td>
-      <td style="border:2px solid black;">${totals.totalMarks}</td>
-    </tr>
-    <tr style="background:lightblue; font-weight:bold;">
-      <td colspan="3" style="border:2px solid black;">Averages</td>
-      <td style="border:2px solid black;">${(totals.english/count).toFixed(1)}</td><td style="border:2px solid black;">-</td>
-      <td style="border:2px solid black;">${(totals.math/count).toFixed(1)}</td><td style="border:2px solid black;">-</td>
-      <td style="border:2px solid black;">${(totals.preTech/count).toFixed(1)}</td><td style="border:2px solid black;">-</td>
-      <td style="border:2px solid black;">${(totals.kiswahili/count).toFixed(1)}</td><td style="border:2px solid black;">-</td>
-      <td style="border:2px solid black;">${(totals.science/count).toFixed(1)}</td><td style="border:2px solid black;">-</td>
-      <td style="border:2px solid black;">${(totals.social/count).toFixed(1)}</td><td style="border:2px solid black;">-</td>
-      <td style="border:2px solid black;">${(totals.agriculture/count).toFixed(1)}</td><td style="border:2px solid black;">-</td>
-      <td style="border:2px solid black;">${(totals.cre/count).toFixed(1)}</td><td style="border:2px solid black;">-</td>
-      <td style="border:2px solid black;">${(totals.art/count).toFixed(1)}</td><td style="border:2px solid black;">-</td>
-      <td style="border:2px solid black;">${(totals.totalMarks/count).toFixed(1)}</td>
-    </tr>
+      <tr style="background:yellow;font-weight:bold;"><td colspan="3">Totals</td>
+        <td>${totals.english}</td><td>-</td><td>${totals.math}</td><td>-</td>
+        <td>${totals.preTech}</td><td>-</td><td>${totals.kiswahili}</td><td>-</td>
+        <td>${totals.science}</td><td>-</td><td>${totals.social}</td><td>-</td>
+        <td>${totals.agriculture}</td><td>-</td><td>${totals.cre}</td><td>-</td>
+        <td>${totals.art}</td><td>-</td><td>${totals.totalMarks}</td>
+      </tr>
+      <tr style="background:lightblue;font-weight:bold;"><td colspan="3">Averages</td>
+        <td>${(totals.english/count).toFixed(1)}</td><td>-</td><td>${(totals.math/count).toFixed(1)}</td><td>-</td>
+        <td>${(totals.preTech/count).toFixed(1)}</td><td>-</td><td>${(totals.kiswahili/count).toFixed(1)}</td><td>-</td>
+        <td>${(totals.science/count).toFixed(1)}</td><td>-</td><td>${(totals.social/count).toFixed(1)}</td><td>-</td>
+        <td>${(totals.agriculture/count).toFixed(1)}</td><td>-</td><td>${(totals.cre/count).toFixed(1)}</td><td>-</td>
+        <td>${(totals.art/count).toFixed(1)}</td><td>-</td><td>${(totals.totalMarks/count).toFixed(1)}</td>
+      </tr>
     </tbody></table>
-    <div style="text-align:center; margin-top:15px;">
-      <button onclick="printSection('${gender}-section','${gradeValue}','${examPeriodValue}')" class="print-button">
-        🖨️ Print ${gender.charAt(0).toUpperCase() + gender.slice(1)} Report
-      </button>
-    </div>
-    </div>
-    `;
-
+    <div style="text-align:center;margin-top:15px;">
+      <button onclick="printSection('${gender}-section','${gradeValue}','${examPeriodValue}')" class="print-button">🖨️ Print ${gender} Report</button>
+    </div></div>`;
     return html;
   }
 
   reportOutput.innerHTML =
-    createTable(genderPerformance.male, "male") +
-    createTable(genderPerformance.female, "female");
+    createTable(genderPerformance.male, "male", top5Male) +
+    createTable(genderPerformance.female, "female", top5Female);
+
+  // Celebration styles
+  if (!document.getElementById("genderPerfStyles")) {
+    const style = document.createElement("style");
+    style.id = "genderPerfStyles";
+    style.textContent = `
+      @keyframes floatUpG {0%{transform:translateY(0) scale(1);}100%{transform:translateY(-150px) scale(1.5);opacity:0;}}
+      @keyframes zoomInFade {from{transform:scale(0.5);opacity:0;} to{transform:scale(1);opacity:1;}}
+      @keyframes fadeOut {from{opacity:1;}to{opacity:0;}}
+    `;
+    document.head.appendChild(style);
+  }
+
+  function showCelebrationPopup(title, topList) {
+    const popup = document.createElement("div");
+    popup.style = `
+      position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+      background:linear-gradient(to right,#fff8dc,#ffe680);border:4px solid gold;
+      padding:25px;border-radius:20px;font:bold 18px sans-serif;
+      box-shadow:0 0 25px gold;animation:zoomInFade 1s ease,fadeOut 1s ease 9s;
+      z-index:10000;text-align:center;line-height:1.6
+    `;
+    popup.innerHTML = `<div>🏅 ${title} 🏅<br><br>${
+      topList.map((t, i) => `${i + 1}. <strong>${t.learner}</strong>: ${t.totalMarks} marks`).join("<br>")
+    }</div>`;
+    document.body.appendChild(popup);
+    setTimeout(() => popup.remove(), 10000);
+  }
+
+  function showFloatingEmojis() {
+    const emojis = ['🎉','🏅','🎇','🏆','🌟','✨','🥇','🥈','🥉'];
+    for (let i = 0; i < 60; i++) {
+      const e = document.createElement("span");
+      const em = emojis[Math.floor(Math.random() * emojis.length)];
+      const size = 20 + Math.random() * 20;
+      e.textContent = em;
+      e.style = `
+        position:fixed;left:${Math.random() * 100}vw;top:${Math.random() * 100}vh;
+        font-size:${size}px;color:hsl(${Math.random() * 360},100%,60%);
+        animation:floatUpG 3s ease-out forwards;pointer-events:none;z-index:9999;
+      `;
+      document.body.appendChild(e);
+      setTimeout(() => e.remove(), 10000);
+    }
+  }
+
+  // 🎉 Celebration: emojis + delayed popups
+  showFloatingEmojis();
+  showCelebrationPopup("Top 5 Female Performers", top5Female);
+  setTimeout(() => {
+    showCelebrationPopup("Top 5 Male Performers", top5Male);
+  }, 10000); // Delay male popup by 10 seconds
+
 }
 
 function printSection(sectionId, grade, examPeriod) {
@@ -4194,7 +4539,6 @@ document.getElementById("confirmGradeBtn").addEventListener("click", () => {
 document.getElementById("cancelGradeBtn").addEventListener("click", () => {
     document.getElementById("customPrompt").style.display = "none";
 });
-
 function combineMarksByGradeWithDetails(mainGrade, selectedPeriod) {
     const rows = document.querySelectorAll("#marksList tr");
     const learnersData = [];
@@ -4206,17 +4550,12 @@ function combineMarksByGradeWithDetails(mainGrade, selectedPeriod) {
 
     rows.forEach(row => {
         const cells = row.querySelectorAll("td");
-
-        // Defensive checks
         if (cells.length < 20) return;
 
         const gradeText = cells[2]?.textContent?.trim()?.toLowerCase();
         const periodAttr = row.getAttribute("data-exam-period")?.trim()?.toLowerCase();
-
         const normalizedMainGrade = mainGrade.trim().toLowerCase();
         const normalizedPeriod = selectedPeriod.trim().toLowerCase();
-
-        // More reliable match
         const gradeMatches = gradeText === normalizedMainGrade || gradeText.includes(normalizedMainGrade);
 
         if (gradeMatches && periodAttr === normalizedPeriod) {
@@ -4231,19 +4570,15 @@ function combineMarksByGradeWithDetails(mainGrade, selectedPeriod) {
                 social: parseFloat(cells[13].textContent) || 0,
                 agriculture: parseFloat(cells[15].textContent) || 0,
                 cre: parseFloat(cells[17].textContent) || 0,
-                creativeArt: parseFloat(cells[19].textContent) || 0,
+                creativeArt: parseFloat(cells[19].textContent) || 0
             };
 
             learnerData.totalMarks = Object.values(learnerData).slice(2).reduce((sum, mark) => sum + mark, 0);
             learnersData.push(learnerData);
-
-            for (let key in totals) {
-                totals[key] += learnerData[key];
-            }
+            for (let key in totals) totals[key] += learnerData[key];
             learnerCount++;
         }
     });
-
 
     if (learnersData.length === 0) {
         Swal.fire({
@@ -4259,6 +4594,7 @@ function combineMarksByGradeWithDetails(mainGrade, selectedPeriod) {
     }
 
     learnersData.sort((a, b) => b.totalMarks - a.totalMarks);
+    const top20 = learnersData.slice(0, 20);
 
     const year = new Date().getFullYear();
     const avg = val => (learnerCount ? (val / learnerCount).toFixed(2) : "0.00");
@@ -4276,131 +4612,139 @@ function combineMarksByGradeWithDetails(mainGrade, selectedPeriod) {
     <table style="width:100%; border-collapse:collapse; font-size:15px;">
         <thead>
             <tr style="background:#f2f2f2;">
-                <th style="border:2px solid black;">No.</th>
-                <th style="border:2px solid black;">Name</th>
-                <th style="border:2px solid black;">Grade</th>
-                <th style="border:2px solid black;">Eng</th><th style="border:2px solid black;">Level</th>
-                <th style="border:2px solid black;">Math</th><th style="border:2px solid black;">Level</th>
-                <th style="border:2px solid black;">Pre-Tech</th><th style="border:2px solid black;">Level</th>
-                <th style="border:2px solid black;">Kisw</th><th style="border:2px solid black;">Level</th>
-                <th style="border:2px solid black;">Scie</th><th style="border:2px solid black;">Level</th>
-                <th style="border:2px solid black;">SST</th><th style="border:2px solid black;">Level</th>
-                <th style="border:2px solid black;">Agric</th><th style="border:2px solid black;">Level</th>
-                <th style="border:2px solid black;">CRE</th><th style="border:2px solid black;">Level</th>
-                <th style="border:2px solid black;">C/A</th><th style="border:2px solid black;">Level</th>
-                <th style="border:2px solid black;">Total</th>
+                <th style="border:3px solid black;">No.</th>
+                <th style="border:3px solid black;">Name</th>
+                <th style="border:3px solid black;">Grade</th>
+                ${['Eng','Math','Pre-Tech','Kisw','Scie','SST','Agric','CRE','C/A'].map(sub => `
+                <th style="border:3px solid black;">${sub}</th>
+                <th style="border:3px solid black;">Level</th>`).join('')}
+                <th style="border:3px solid black;">Total</th>
             </tr>
         </thead>
         <tbody>`;
 
     learnersData.forEach((l, i) => {
-        html += `
-        <tr>
-            <td style="border:2px solid black;">${i + 1}</td>
-            <td style="border:2px solid black;">${l.name}</td>
-            <td style="border:2px solid black;">${l.grade}</td>
-            <td style="border:2px solid black;">${l.eng}</td><td style="border:2px solid black;">${getLevel(l.eng)}</td>
-            <td style="border:2px solid black;">${l.math}</td><td style="border:2px solid black;">${getLevel(l.math)}</td>
-            <td style="border:2px solid black;">${l.preTech}</td><td style="border:2px solid black;">${getLevel(l.preTech)}</td>
-            <td style="border:2px solid black;">${l.kiswahili}</td><td style="border:2px solid black;">${getLevel(l.kiswahili)}</td>
-            <td style="border:2px solid black;">${l.science}</td><td style="border:2px solid black;">${getLevel(l.science)}</td>
-            <td style="border:2px solid black;">${l.social}</td><td style="border:2px solid black;">${getLevel(l.social)}</td>
-            <td style="border:2px solid black;">${l.agriculture}</td><td style="border:2px solid black;">${getLevel(l.agriculture)}</td>
-            <td style="border:2px solid black;">${l.cre}</td><td style="border:2px solid black;">${getLevel(l.cre)}</td>
-            <td style="border:2px solid black;">${l.creativeArt}</td><td style="border:2px solid black;">${getLevel(l.creativeArt)}</td>
-            <td style="border:2px solid black;">${l.totalMarks}</td>
+        html += `<tr>
+            <td style="border:3px solid black;">${i + 1}</td>
+            <td style="border:3px solid black;">${l.name}</td>
+            <td style="border:3px solid black;">${l.grade}</td>
+            ${['eng','math','preTech','kiswahili','science','social','agriculture','cre','creativeArt']
+            .map(k => `<td style="border:3px solid black;">${l[k]}</td><td style="border:3px solid black;">${getLevel(l[k])}</td>`).join('')}
+            <td style="border:3px solid black;">${l.totalMarks}</td>
         </tr>`;
     });
 
     html += `
-        <tr style="background:#e6f7ff; font-weight:bold;">
-            <td colspan="3" style="border:2px solid black;">TOTAL</td>
-            <td style="border:2px solid black;">${totals.eng}</td><td style="border:2px solid black;"></td>
-            <td style="border:2px solid black;">${totals.math}</td><td style="border:2px solid black;"></td>
-            <td style="border:2px solid black;">${totals.preTech}</td><td style="border:2px solid black;"></td>
-            <td style="border:2px solid black;">${totals.kiswahili}</td><td style="border:2px solid black;"></td>
-            <td style="border:2px solid black;">${totals.science}</td><td style="border:2px solid black;"></td>
-            <td style="border:2px solid black;">${totals.social}</td><td style="border:2px solid black;"></td>
-            <td style="border:2px solid black;">${totals.agriculture}</td><td style="border:2px solid black;"></td>
-            <td style="border:2px solid black;">${totals.cre}</td><td style="border:2px solid black;"></td>
-            <td style="border:2px solid black;">${totals.creativeArt}</td><td style="border:2px solid black;"></td>
-            <td style="border:2px solid black;">${totals.totalMarks}</td>
-        </tr>
-        <tr style="background:#fcf8e3; font-weight:bold;">
-            <td colspan="3" style="border:2px solid black;">AVERAGE</td>
-            <td style="border:2px solid black;">${avg(totals.eng)}</td><td style="border:2px solid black;"></td>
-            <td style="border:2px solid black;">${avg(totals.math)}</td><td style="border:2px solid black;"></td>
-            <td style="border:2px solid black;">${avg(totals.preTech)}</td><td style="border:2px solid black;"></td>
-            <td style="border:2px solid black;">${avg(totals.kiswahili)}</td><td style="border:2px solid black;"></td>
-            <td style="border:2px solid black;">${avg(totals.science)}</td><td style="border:2px solid black;"></td>
-            <td style="border:2px solid black;">${avg(totals.social)}</td><td style="border:2px solid black;"></td>
-            <td style="border:2px solid black;">${avg(totals.agriculture)}</td><td style="border:2px solid black;"></td>
-            <td style="border:2px solid black;">${avg(totals.cre)}</td><td style="border:2px solid black;"></td>
-            <td style="border:2px solid black;">${avg(totals.creativeArt)}</td><td style="border:2px solid black;"></td>
-            <td style="border:2px solid black;">${avg(totals.totalMarks)}</td>
-        </tr>
-    </tbody></table>`;
+    <tr style="background:#e6f7ff; font-weight:bold;">
+        <td colspan="3" style="border:3px solid black;">TOTAL</td>
+        ${['eng','math','preTech','kiswahili','science','social','agriculture','cre','creativeArt']
+        .map(k => `<td style="border:3px solid black;">${totals[k]}</td><td style="border:3px solid black;"></td>`).join('')}
+        <td style="border:3px solid black;">${totals.totalMarks}</td>
+    </tr>
+    <tr style="background:#fcf8e3; font-weight:bold;">
+        <td colspan="3" style="border:3px solid black;">AVERAGE</td>
+        ${['eng','math','preTech','kiswahili','science','social','agriculture','cre','creativeArt']
+        .map(k => `<td style="border:3px solid black;">${avg(totals[k])}</td><td style="border:3px solid black;"></td>`).join('')}
+        <td style="border:3px solid black;">${avg(totals.totalMarks)}</td>
+    </tr></tbody></table>`;
 
     const reportOutput = document.getElementById("reportOutput");
     reportOutput.innerHTML = html;
-// Add print button
-let printButton = document.getElementById("printCombinedMarksBtn");
-if (!printButton) {
-    printButton = document.createElement("button");
-    printButton.id = "printCombinedMarksBtn";
-    printButton.className = "print-button";
-    printButton.innerHTML = '<i class="fas fa-print"></i> Print Report';
-    reportOutput.appendChild(printButton);
 
-    printButton.addEventListener("click", () => {
-        const today = new Date();
-        const printDate = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
+    // Print Button
+    let printButton = document.getElementById("printCombinedMarksBtn");
+    if (!printButton) {
+        printButton = document.createElement("button");
+        printButton.id = "printCombinedMarksBtn";
+        printButton.className = "print-button";
+        printButton.innerHTML = '<i class="fas fa-print"></i> Print Report';
+        reportOutput.appendChild(printButton);
 
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-            <html>
-                <head>
-                    <title>Combined Marks Report</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; margin: 20px; }
-                        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-                        table, th, td { border: 2px solid black; padding: 8px; }
-                        th { background-color: #f4f4f4; font-weight: bold; }
-                        img { max-width: 100px; }
-                        .stamp {
-                            border: 2px solid blue;
-                            color: blue;
-                            text-align: center;
-                            width: 200px;
-                            height: 70px;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            margin: 30px auto;
-                            font-weight: bold;
-                            font-size: 14px;
-                        }
-                        @media screen {
-                            .stamp { display: none; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    ${reportOutput.innerHTML}
-                    <div class="stamp">
-                        Nachu Junior School<br>
-                        P.O. Box 561-00902, Kikuyu<br>
-                        Exam Department<br>
-                        Date: ${printDate}
-                    </div>
-                </body>
-            </html>
-        `);
-        printWindow.document.close();
-        printWindow.print();
-    });
+        printButton.addEventListener("click", () => {
+            const today = new Date();
+            const printDate = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html><head><title>Combined Marks Report</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    table, th, td { border: 3px solid black; border-collapse: collapse; padding: 8px; }
+                    th { background-color: #f4f4f4; }
+                    .stamp {
+                        border: 2px solid blue;
+                        color: blue; width: 200px; height: 70px;
+                        display: flex; align-items: center; justify-content: center;
+                        margin: 30px auto; font-weight: bold; font-size: 14px;
+                    }
+                    @media screen {.stamp { display: none; }}
+                </style>
+                </head><body>${reportOutput.innerHTML}
+                <div class="stamp">Nachu Junior School<br>P.O. Box 561-00902, Kikuyu<br>Exam Department<br>Date: ${printDate}</div>
+                </body></html>`);
+            printWindow.document.close();
+            printWindow.print();
+        });
+    }
+
+    // 🎉 Styles & Effects
+    if (!document.getElementById("perfCelebrationStyles")) {
+        const s = document.createElement("style");
+        s.id = "perfCelebrationStyles";
+        s.textContent = `
+            @keyframes floatUpP {0%{transform:translateY(0) scale(1);}100%{transform:translateY(-150px) scale(1.5);opacity:0;}}
+            @keyframes zoomInFade {from{transform:scale(0.5);opacity:0;} to{transform:scale(1);opacity:1;}}
+            @keyframes fadeOut {from{opacity:1;}to{opacity:0;}}
+        `;
+        document.head.appendChild(s);
+    }
+
+    function showEmojis() {
+        const list = ['🎇','🎉','🥇','💫','🏆','🌟','🥈','🥉','✨'];
+        for (let i = 0; i < 60; i++) {
+            const e = document.createElement("span");
+            const em = list[Math.floor(Math.random() * list.length)];
+            const size = 20 + Math.random() * 20;
+            e.textContent = em;
+            e.style = `position:fixed;left:${Math.random()*100}vw;top:${Math.random()*100}vh;
+                       font-size:${size}px;color:hsl(${Math.random()*360},100%,60%);
+                       animation:floatUpP 3s ease-out forwards;pointer-events:none;z-index:9999`;
+            document.body.appendChild(e);
+            setTimeout(() => e.remove(), 10000);
+        }
+    }
+
+    function showPopup(index) {
+        if (index >= top20.length) return;
+        const learner = top20[index];
+        const popup = document.createElement("div");
+        popup.style = `
+            position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+            background:linear-gradient(to right,#fff8dc,#ffe680);
+            border:4px solid gold;padding:25px;border-radius:20px;
+            font:bold 20px sans-serif;box-shadow:0 0 25px gold;
+            animation:zoomInFade 1s ease;z-index:10000;text-align:center;
+        `;
+        popup.innerHTML = `<div>🏅 <strong>#${index + 1} ${learner.name}</strong><br>Total Marks: ${learner.totalMarks}</div>`;
+        document.body.appendChild(popup);
+
+        let timeout = setTimeout(() => {
+            popup.remove();
+            showPopup(index + 1);
+        }, 5000);
+
+        popup.addEventListener("mousedown", () => clearTimeout(timeout));
+        popup.addEventListener("mouseup", () => {
+            timeout = setTimeout(() => {
+                popup.remove();
+                showPopup(index + 1);
+            }, 1000);
+        });
+    }
+
+    showEmojis();
+    showPopup(0);
 }
-}
+
 
 
 
@@ -6027,7 +6371,6 @@ document.getElementById("subjectRankingReportBtn").addEventListener("click", () 
 });
 
 
-
 function generateSubjectRankingPerLearner(selectedGrade, selectedPeriod) {
     const subjects = [
         'English', 'Mathematics', 'Pre-Technical Studies',
@@ -6041,16 +6384,14 @@ function generateSubjectRankingPerLearner(selectedGrade, selectedPeriod) {
     ];
 
     const year = new Date().getFullYear();
+    const learners = [];
 
     let html = `
         <div style="text-align: center; margin-bottom: 20px;">
-            <img src="https://i.imgur.com/2bSAbwq.jpeg" alt="School Logo" style="display: block; margin: 0 auto 10px; max-width: 80px; height: auto;">
-            <h2 style="margin: 0;">NACHU JUNIOR SCHOOL LEARNER  SUBJECT TRACKER  REPORT</h2>
-            <p style="margin: 5px 0;">Address: P.O. Box 561-00902, Kikuyu, Kenya</p>
-            <p style="margin: 5px 0;">School Motto: "My Talent My Passion"</p>
-            <p style="margin: 5px 0;">Year: ${year}</p>
-            <p style="margin: 5px 0;">Grade: ${selectedGrade}</p>
-            <p style="margin: 5px 0;">Exam Period: ${selectedPeriod}</p>
+            <img src="https://i.imgur.com/2bSAbwq.jpeg" alt="School Logo" style="display: block; margin: 0 auto 10px; max-width: 80px;">
+            <h2 style="margin: 0;">NACHU JUNIOR SCHOOL LEARNER SUBJECT TRACKER REPORT</h2>
+            <p>Address: P.O. Box 561-00902, Kikuyu, Kenya | Motto: "My Talent My Passion"</p>
+            <p>Year: ${year} | Grade: ${selectedGrade} | Exam Period: ${selectedPeriod}</p>
         </div>
 
         <table style="width:100%; border-collapse: collapse; margin-top: 15px;">
@@ -6073,13 +6414,15 @@ function generateSubjectRankingPerLearner(selectedGrade, selectedPeriod) {
         if (row.getAttribute("data-exam-period") !== selectedPeriod) return;
 
         const learnerName = row.cells[1].textContent;
-
         const scores = subjectKeys.map((key, i) => ({
             subject: subjects[i],
             score: parseFloat(row.cells[3 + i * 2].textContent) || 0
         }));
-
         scores.sort((a, b) => b.score - a.score);
+        const top5 = scores.slice(0, 5);
+        const total = top5.reduce((sum, s) => sum + s.score, 0);
+
+        learners.push({ name: learnerName, topSubjects: top5, total });
 
         scores.forEach((entry, idx) => {
             html += `
@@ -6096,16 +6439,99 @@ function generateSubjectRankingPerLearner(selectedGrade, selectedPeriod) {
         learnerCount++;
     });
 
-    html += `</tbody></table>`;
-
-    html += `
+    html += `</tbody></table>
         <div style="text-align:right; margin-top: 20px;">
             <button id="printLearnerSubjectRankBtn" style="padding: 8px 16px; background: #007BFF; color: white; border: none; border-radius: 4px;">Print Report</button>
         </div>`;
 
     document.getElementById("reportOutput").innerHTML = html;
 
-    // Add print functionality
+    // 🎉 Celebration Styles
+    if (!document.getElementById("perfCelebrationStyles")) {
+        const s = document.createElement("style");
+        s.id = "perfCelebrationStyles";
+        s.textContent = `
+            @keyframes floatUpP {0%{transform:translateY(0) scale(1);}100%{transform:translateY(-150px) scale(1.5);opacity:0;}}
+            @keyframes zoomInFade {from{transform:scale(0.5);opacity:0;} to{transform:scale(1);opacity:1;}}
+            @keyframes fadeOut {from{opacity:1;}to{opacity:0;}}
+        `;
+        document.head.appendChild(s);
+    }
+
+    function showEmojis() {
+        const list = ['🎇','🎉','🥇','💫','🏆','🌟','🥈','🥉','✨'];
+        for (let i = 0; i < 60; i++) {
+            const e = document.createElement("span");
+            const em = list[Math.floor(Math.random() * list.length)];
+            const size = 20 + Math.random() * 20;
+            e.textContent = em;
+            e.style = `position:fixed;left:${Math.random()*100}vw;top:${Math.random()*100}vh;
+                       font-size:${size}px;color:hsl(${Math.random()*360},100%,60%);
+                       animation:floatUpP 3s ease-out forwards;pointer-events:none;z-index:9999`;
+            document.body.appendChild(e);
+            setTimeout(() => e.remove(), 10000);
+        }
+    }
+
+    function showPopup(index, list) {
+    if (index >= list.length) return;
+
+    const learner = list[index];
+    const popup = document.createElement("div");
+    popup.style = `
+        position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+        background:linear-gradient(to right,#fff8dc,#ffe680);
+        border:4px solid gold;padding:25px;border-radius:20px;
+        font:bold 20px sans-serif;box-shadow:0 0 25px gold;
+        animation:zoomInFade 1s ease;
+        z-index:10000;text-align:center;
+        transition: opacity 1s;
+    `;
+    popup.innerHTML = `<div>🌟 Top 5 Subjects for <strong>${learner.name}</strong> 🌟<br><br>${
+        learner.topSubjects.map((s, i) => `${i+1}. <strong>${s.subject}</strong>: ${s.score}`).join("<br>")
+    }</div>`;
+    document.body.appendChild(popup);
+
+    let timeoutId;
+    let released = false;
+
+    function startTimer() {
+        timeoutId = setTimeout(() => {
+            popup.remove();
+            showPopup(index + 1, list);
+        }, 5000);
+    }
+
+    function clearTimer() {
+        clearTimeout(timeoutId);
+    }
+
+    // Pause on hold
+    popup.addEventListener('mousedown', clearTimer);
+    popup.addEventListener('touchstart', clearTimer);
+
+    // Resume on release
+    popup.addEventListener('mouseup', () => {
+        if (!released) {
+            released = true;
+            startTimer();
+        }
+    });
+    popup.addEventListener('touchend', () => {
+        if (!released) {
+            released = true;
+            startTimer();
+        }
+    });
+
+    // Start initial timer
+    startTimer();
+}
+
+
+    showEmojis();
+    showPopup(0, learners);
+
     document.getElementById("printLearnerSubjectRankBtn").addEventListener("click", () => {
         const printContent = document.getElementById("reportOutput").innerHTML;
         const printWindow = window.open("", "_blank", "width=900,height=650");
@@ -6126,11 +6552,11 @@ function generateSubjectRankingPerLearner(selectedGrade, selectedPeriod) {
                 <body>${printContent}</body>
             </html>
         `);
-
         printWindow.document.close();
         printWindow.print();
     });
 }
+
   
  function enableEnterAsTab(containerSelector) {
     const container = document.querySelector(containerSelector);
